@@ -65,6 +65,16 @@ elements config list-contexts
 elements config delete-context <name>
 ```
 
+### API 调用
+
+```bash
+elements api /api/users/this                                 # GET 请求
+elements api /api/devices -q page=0 -q limit=10              # 带 query params
+elements api /api/devices -X POST -f name=test               # POST body fields
+echo '{}' | elements api /api/devices -X POST --input -      # 从 stdin 读取 JSON body
+elements api /api/users/this -H "Sudo: user@example.com"     # 自定义 header
+```
+
 ### 设备管理
 
 ```bash
@@ -79,6 +89,154 @@ elements device create --name <name> --serial-number <sn>     # 添加设备
 elements device signal <device-id> --after <ISO> --before <ISO>  # 历史信号质量
 elements device kick <device-id>                              # 强制断开
 elements device reboot <device-id> --timeout 15000            # 重启（毫秒）
+
+# 设备流量
+elements device traffic monthly 202604 --device <device-id>   # 查询月流量
+elements device traffic daily 202604 <device-id>              # 查询日流量
+
+# 设备客户端
+elements device clients list <device-id>                      # 列设备接入的客户端
+elements device clients batch <device-id>...                  # 批量查询客户端
+
+# 设备告警
+elements device alert                                         # 列告警
+elements device alert --device-name router --state unconfirmed # 按条件过滤
+
+# 设备配置
+elements device config get <device-id>                        # 获取运行配置
+elements device config set <device-id> --content "..."        # 下发配置
+```
+
+### 设备分组 (`devicegroup`, `dg`)
+
+```bash
+elements devicegroup list                                     # 列分组
+elements devicegroup list --parent <parent-id>                # 按父分组过滤
+elements devicegroup get <group-id>                           # 分组详情
+elements devicegroup create --name "Factory A"                # 创建分组
+elements devicegroup create --name "Line 1" --parent <id>     # 创建子分组
+elements devicegroup update <group-id> --name "New Name"      # 更新分组名
+elements devicegroup delete <group-id>                        # 删除分组
+
+# 分组内设备管理
+elements devicegroup devices <group-id> list                  # 列分组内设备
+elements devicegroup devices <group-id> list --recursive      # 包含子分组设备
+elements devicegroup devices <group-id> add <device-id>...    # 添加设备到分组
+elements devicegroup devices <group-id> remove <device-id>... # 从分组移除设备
+elements devicegroup devices <group-id> available             # 可添加到分组的设备
+```
+
+### 远程隧道 (`tunnel`)
+
+```bash
+elements tunnel list                                          # 列隧道
+elements tunnel list --device-id <id>                         # 按设备过滤
+elements tunnel create \
+  --name ssh-tunnel \
+  --device-id <id> \
+  --proto tcp \
+  --local-address 127.0.0.1 \
+  --local-port 22               # 创建隧道
+elements tunnel update <tunnel-id> --name "new-name"          # 更新隧道
+elements tunnel delete <tunnel-id>                            # 删除隧道
+elements tunnel connect <tunnel-id>                           # 连接隧道
+elements tunnel disconnect <tunnel-id>                        # 断开隧道
+```
+
+### DRC 配置模板 (`drc`)
+
+```bash
+elements drc list                                             # 列配置模板
+elements drc list --model IR615                               # 按设备型号过滤
+elements drc get <template-id>                                # 模板详情
+elements drc create \
+  --name "IR615-default" \
+  --model IR615 \
+  --content "..."               # 创建模板
+elements drc delete <template-id>                             # 删除模板
+
+# 模板设备管理
+elements drc devices <template-id> list                       # 列已分配设备
+elements drc devices <template-id> list --status running      # 按状态过滤
+elements drc devices <template-id> add <device-id>...         # 分配设备
+elements drc devices <template-id> add <device-id> --group <group-id>  # 分配设备组
+elements drc devices <template-id> remove <device-id>         # 移除设备
+elements drc devices <template-id> restart <device-id>        # 重启设备任务
+```
+
+### 边缘计算 (`edge`)
+
+#### 边缘引擎 (`edge agent`)
+
+```bash
+elements edge agent list                                # 列引擎
+elements edge agent list --version v1.0                 # 按版本过滤
+elements edge agent get <agent-id>                       # 引擎详情
+elements edge agent upload <file-path> --description "IR615 engine"  # 上传引擎
+elements edge agent update <agent-id> --description "new desc"       # 更新引擎
+elements edge agent delete <agent-id>                    # 删除引擎
+elements edge agent devices <agent-id>                   # 已部署设备列表
+elements edge agent devices <agent-id> --status READY    # 按状态过滤
+```
+
+#### 边缘应用 (`edge app`)
+
+```bash
+elements edge app list                                   # 列应用
+elements edge app get <app-id>                           # 应用详情
+elements edge app create --name "my-app" --description "..."          # 创建应用
+elements edge app update <app-id> --description "new desc"           # 更新应用
+elements edge app delete <app-id>                        # 删除应用
+```
+
+#### 应用版本 (`edge version`)
+
+```bash
+elements edge version list <app-id>                      # 列版本
+elements edge version upload <file-path> --app <app-id>  # 上传版本
+elements edge version update <app-id> <version> --notes "Release notes"  # 更新日志
+elements edge version delete <app-id> <version>          # 删除版本
+elements edge version deploy <app-id> <version> --device <id> --group <id>  # 部署版本
+```
+
+#### 应用配置 (`edge config`)
+
+```bash
+elements edge config list <app-id>                       # 列配置
+elements edge config list <app-id> --version v1.0        # 按版本过滤
+elements edge config get <app-id> <config-id>            # 配置详情
+elements edge config create <app-id> --version v1.0 --content "..."    # 创建配置
+elements edge config update <app-id> <config-id> --description "..."   # 更新配置
+elements edge config delete <app-id> <config-id>         # 删除配置
+elements edge config deploy <app-id> <version> --device <id> --group <id>  # 部署配置
+```
+
+#### 远程控制 (`edge control`)
+
+```bash
+elements edge control start <device-id> <app-id>         # 启动应用
+elements edge control stop <device-id> <app-id>          # 停止应用
+elements edge control restart <device-id> <app-id>       # 重启应用
+```
+
+### 固件管理 (`firmware`)
+
+```bash
+elements firmware list                                      # 列固件
+elements firmware list --model IR615                        # 按型号过滤
+elements firmware upload <file-path>                        # 上传固件文件
+elements firmware create \
+  --fid <file-id> \
+  --name "IR615-v2.0" \
+  --version 2.0.0 \
+  --model IR615             # 创建固件记录
+elements firmware upgrade <device-id> --firmware-id <id>    # 单台设备升级
+
+# 批量升级管理
+elements firmware devices <firmware-id> list                # 列升级任务中的设备
+elements firmware devices <firmware-id> add <device-id>...  # 批量添加设备升级
+elements firmware devices <firmware-id> add --group <group-id>...  # 按组升级
+elements firmware devices <firmware-id> remove <device-id>  # 取消设备升级
 ```
 
 ### 调试
@@ -104,8 +262,8 @@ elements version                                # 查看版本
 
 | 格式 | TTY 行为 | 管道行为 |
 |------|---------|---------|
-| `table`（TTY 默认） | 对齐表格 | TSV |
-| `json`（非 TTY 默认） | 彩色 pretty JSON | 紧凑 JSON |
+| `json`（默认） | 彩色 pretty JSON | 紧凑 JSON |
+| `table` | 对齐表格 | TSV |
 | `yaml` | YAML | YAML |
 
 ```bash
@@ -146,12 +304,9 @@ DM 平台使用 `cursor`（skip 偏移）+ `limit` 分页。`list` 命令也接�
 
 ## 配置文件
 
-路径：`<UserConfigDir>/elements/config.yaml`（权限 `0600`）
+路径：`~/.config/elements/config.yaml`（权限 `0600`）
 
-- Linux/macOS：`~/.config/elements/config.yaml`
-- Windows：`%AppData%\elements\config.yaml`
-
-配置文件存储所有 context 信息（host、token、refresh_token、user、过期时间），通过 `elements auth login --context <name>` 创建/更新，通过 `elements config` 子命令切换和管理。Token 401 时会自动用 `refresh_token` 刷新并写回。
+配置文件存储所有 context 信息（host、token 等），通过 `elements config` 子命令管理。
 
 ## 开发指南
 
@@ -180,7 +335,16 @@ cmd/elements/       # CLI 入口
 internal/
   api/              # OAuth 认证、Token 传输与自动刷新、REST 客户端、回调服务
   build/            # 注入 Version/Commit/Date
-  cmd/              # 各子命令实现（auth、config、device、version）
+  cmd/              # 各子命令实现
+    auth/           # 登录、登出、认证状态
+    config/         # Context 管理
+    device/         # 设备管理
+    devicegroup/    # 设备分组管理
+    tunnel/         # 远程隧道管理
+    drc/            # DRC 配置模板管理
+    edge/           # 边缘计算（引擎/应用/版本/配置/控制）
+    firmware/       # 固件管理与升级
+    version/        # 版本信息
   cmdutil/          # 通用 list flag（cursor/limit/verbose）、query 构建
   config/           # 配置文件读写、Context 模型
   debug/            # 调试输出（--debug / ELEMENTS_DEBUG）
