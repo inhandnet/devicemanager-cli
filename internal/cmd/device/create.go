@@ -11,8 +11,8 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 	var name, serialNumber string
 
 	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Add a device",
+		Use:     "create",
+		Short:   "Add a device",
 		Example: `  elements device create --name "test-router" --serial-number GL5022101241734`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()

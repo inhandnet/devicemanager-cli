@@ -11,9 +11,9 @@ import (
 
 func NewCmdUpgrade(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "upgrade <device-id>",
-		Short: "Upgrade a single device",
-		Args:  cobra.ExactArgs(1),
+		Use:     "upgrade <device-id>",
+		Short:   "Upgrade a single device",
+		Args:    cobra.ExactArgs(1),
 		Example: `  elements firmware upgrade <device-id> --firmware-id <id> --timeout 600`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()

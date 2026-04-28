@@ -31,7 +31,7 @@ func NewCmdDevicesAvailable(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			opts.ListFlags.ApplyTo(q)
+			opts.ApplyTo(q)
 			cmdutil.SetQueryParam(q, "name", opts.Name)
 			cmdutil.SetQueryParam(q, "serial_number", opts.SerialNumber)
 

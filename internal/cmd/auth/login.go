@@ -202,9 +202,9 @@ func fetchCurrentUser(ctx *config.Context) (string, string) {
 }
 
 // openBrowser tries to open a URL in the default browser.
-func openBrowser(url string) {
+func openBrowser(targetURL string) {
 	// Use platform-specific command
-	cmd := browserCmd(url)
+	cmd := browserCmd(targetURL)
 	if cmd != nil {
 		_ = cmd.Start()
 	}

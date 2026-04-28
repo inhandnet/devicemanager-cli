@@ -32,7 +32,7 @@ func NewCmdDevicesList(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			opts.ListFlags.ApplyTo(q)
+			opts.ApplyTo(q)
 			cmdutil.SetQueryParam(q, "name", opts.Name)
 			cmdutil.SetQueryParam(q, "serialNumber", opts.SerialNumber)
 			cmdutil.SetQueryParam(q, "status", opts.Status)

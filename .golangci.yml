@@ -1,0 +1,83 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/inhandnet/elements-cli
+
+linters:
+  default: none
+  enable:
+    - bodyclose
+    - errcheck
+    - gocritic
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
+    - noctx
+    - nolintlint
+    - staticcheck
+    - unconvert
+    - unused
+
+  exclusions:
+    generated: strict
+    presets:
+      - std-error-handling
+      - common-false-positives
+    paths:
+      - vendor
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - gosec
+          - govet
+          - noctx
+      - linters:
+          - errcheck
+        text: MarkFlagRequired
+      - linters:
+          - noctx
+        path: internal/api/
+      - linters:
+          - noctx
+        path: internal/cmd/auth/
+      - linters:
+          - gocritic
+        text: unnamedResult|builtinShadow|ifElseChain|paramTypeCombine|stringXbytes|hugeParam
+
+  settings:
+    errcheck:
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - (io.Closer).Close
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+        - style
+    gosec:
+      excludes:
+        - G104 # duplicates errcheck
+        - G117 # struct field name matches secret pattern (false positive for RefreshToken)
+        - G304 # file inclusion via variable (CLI reads config by design)
+        - G704 # SSRF via taint (CLI api command takes user-provided URLs by design)
+        - G705 # XSS via taint (false positive: CLI writes to terminal/files, not HTTP)
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

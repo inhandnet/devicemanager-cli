@@ -61,9 +61,9 @@ func NewCmdTrafficMonthly(f *factory.Factory) *cobra.Command {
 
 func NewCmdTrafficDaily(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "daily <month> <device-id>",
-		Short: "Query daily traffic for a device (YYYYMM)",
-		Args:  cobra.ExactArgs(2),
+		Use:     "daily <month> <device-id>",
+		Short:   "Query daily traffic for a device (YYYYMM)",
+		Args:    cobra.ExactArgs(2),
 		Example: `  elements device traffic daily 202604 <device-id>`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()

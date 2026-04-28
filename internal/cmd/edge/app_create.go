@@ -11,8 +11,8 @@ import (
 
 func newCmdAppCreate(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create an edge app",
+		Use:     "create",
+		Short:   "Create an edge app",
 		Example: `  elements edge app create --name "my-app" --description "My edge app"`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()

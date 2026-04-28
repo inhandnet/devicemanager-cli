@@ -23,9 +23,9 @@ func NewCmdConfig(f *factory.Factory) *cobra.Command {
 
 func NewCmdConfigGet(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get <device-id>",
-		Short: "Get device running configuration",
-		Args:  cobra.ExactArgs(1),
+		Use:     "get <device-id>",
+		Short:   "Get device running configuration",
+		Args:    cobra.ExactArgs(1),
 		Example: `  elements device config get <device-id>`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
@@ -77,7 +77,7 @@ func NewCmdConfigSet(f *factory.Factory) *cobra.Command {
 			desc, _ := cmd.Flags().GetString("description")
 
 			body := map[string]interface{}{
-				"deviceType":   0,
+				"deviceType":    0,
 				"deviceContent": content,
 			}
 			if desc != "" {

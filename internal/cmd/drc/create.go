@@ -21,8 +21,8 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 	opts := &CreateOptions{}
 
 	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create a DRC template",
+		Use:     "create",
+		Short:   "Create a DRC template",
 		Example: `  elements drc create --name "IR615-default" --model IR615 --content "..."`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()

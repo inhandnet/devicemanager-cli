@@ -7,11 +7,11 @@ import (
 	"runtime"
 )
 
-func browserCmd(url string) *exec.Cmd {
+func browserCmd(targetURL string) *exec.Cmd {
 	switch runtime.GOOS {
 	case "darwin":
-		return exec.Command("open", url)
+		return exec.Command("open", targetURL)
 	default:
-		return exec.Command("xdg-open", url)
+		return exec.Command("xdg-open", targetURL)
 	}
 }

@@ -29,7 +29,7 @@ func NewCmdList(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			opts.ListFlags.ApplyTo(q)
+			opts.ApplyTo(q)
 			cmdutil.SetQueryParam(q, "parent", opts.Parent)
 
 			output, _ := cmd.Flags().GetString("output")
