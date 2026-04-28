@@ -21,8 +21,8 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 	opts := &CreateOptions{}
 
 	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create a tunnel",
+		Use:     "create",
+		Short:   "Create a tunnel",
 		Example: `  elements tunnel create --name ssh-tunnel --device-id <id> --proto tcp --local-address 127.0.0.1 --local-port 22`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()

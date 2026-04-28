@@ -22,8 +22,8 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 	opts := &CreateOptions{}
 
 	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create a firmware entry",
+		Use:     "create",
+		Short:   "Create a firmware entry",
 		Example: `  elements firmware create --fid <file-id> --name "IR615-v2.0" --version 2.0.0 --model IR615`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()

@@ -33,7 +33,7 @@ func NewCmdAlert(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			opts.ListFlags.ApplyTo(q)
+			opts.ApplyTo(q)
 			cmdutil.SetQueryParam(q, "device_name", opts.DeviceName)
 			cmdutil.SetQueryParam(q, "rule_name", opts.RuleName)
 			cmdutil.SetQueryParam(q, "start_time", opts.StartTime)

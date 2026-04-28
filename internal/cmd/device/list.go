@@ -40,7 +40,7 @@ func NewCmdList(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			opts.ListFlags.ApplyTo(q)
+			opts.ApplyTo(q)
 			cmdutil.SetQueryParam(q, "name", opts.Name)
 			cmdutil.SetQueryParam(q, "model", opts.Model)
 			cmdutil.SetQueryParam(q, "online", opts.Online)

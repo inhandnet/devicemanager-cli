@@ -40,7 +40,7 @@ test:
 	CGO_ENABLED=0 go test ./... -v
 
 fmt:
-	gofmt -w .
+	golangci-lint fmt ./...
 
 lint:
 	golangci-lint run ./...
