@@ -18,6 +18,8 @@ type TokenTransport struct {
 	Token        string
 	RefreshToken string
 	Host         string // API host for refresh requests
+	ClientID     string
+	ClientSecret string
 	OnRefresh    func(accessToken, refreshToken string, expiry time.Time)
 	Base         http.RoundTripper
 }
@@ -39,7 +41,7 @@ func (t *TokenTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		resp.Body.Close()
 		debug.Log("token expired, refreshing...")
 
-		newToken, refreshErr := RefreshAccessToken(t.Host, t.RefreshToken)
+		newToken, refreshErr := RefreshAccessToken(t.Host, t.ClientID, t.ClientSecret, t.RefreshToken)
 		if refreshErr != nil {
 			debug.Log("token refresh failed: %v", refreshErr)
 			return resp, nil
