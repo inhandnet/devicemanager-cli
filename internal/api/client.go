@@ -7,11 +7,11 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/inhandnet/elements-cli/internal/build"
-	"github.com/inhandnet/elements-cli/internal/debug"
+	"github.com/inhandnet/devicemanager-cli/internal/build"
+	"github.com/inhandnet/devicemanager-cli/internal/debug"
 )
 
-var userAgent = fmt.Sprintf("elements-cli/%s (%s/%s)", build.Version, runtime.GOOS, runtime.GOARCH)
+var userAgent = fmt.Sprintf("devicemanager-cli/%s (%s/%s)", build.Version, runtime.GOOS, runtime.GOARCH)
 
 // TokenTransport injects Authorization header and auto-refreshes on 401.
 type TokenTransport struct {

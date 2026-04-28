@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/cmdutil"
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/cmdutil"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 type DevicesAvailableOptions struct {

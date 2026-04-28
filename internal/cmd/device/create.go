@@ -3,8 +3,8 @@ package device
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 func NewCmdCreate(f *factory.Factory) *cobra.Command {
@@ -13,7 +13,7 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create",
 		Short:   "Add a device",
-		Example: `  elements device create --name "test-router" --serial-number GL5022101241734`,
+		Example: `  devicemanager device create --name "test-router" --serial-number GL5022101241734`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

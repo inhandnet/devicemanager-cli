@@ -5,10 +5,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/inhandnet/elements-cli/internal/api"
-	"github.com/inhandnet/elements-cli/internal/config"
-	"github.com/inhandnet/elements-cli/internal/debug"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/api"
+	"github.com/inhandnet/devicemanager-cli/internal/config"
+	"github.com/inhandnet/devicemanager-cli/internal/debug"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 type Factory struct {

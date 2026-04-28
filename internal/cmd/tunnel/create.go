@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 type CreateOptions struct {
@@ -23,7 +23,7 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create",
 		Short:   "Create a tunnel",
-		Example: `  elements tunnel create --name ssh-tunnel --device-id <id> --proto tcp --local-address 127.0.0.1 --local-port 22`,
+		Example: `  devicemanager tunnel create --name ssh-tunnel --device-id <id> --proto tcp --local-address 127.0.0.1 --local-port 22`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

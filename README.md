@@ -1,353 +1,350 @@
-# elements CLI
+# devicemanager CLI
 
-InHand Device Manager (DM) 平台的命令行工具，支持认证、多环境 context 切换、设备管理及多种输出格式。
+Command-line tool for the InHand Device Manager (DM) platform. Supports authentication, multi-environment context switching, device management, and multiple output formats.
 
-## 安装
+## Installation
 
-### 从源码构建
+### Build from source
 
 ```bash
-# 需要 Go 1.24+
-make build    # 输出到 bin/elements
-make install  # 安装到 $GOPATH/bin
+# Requires Go 1.25+
+make build    # Output to bin/devicemanager
+make install  # Install to $GOPATH/bin
 ```
 
-> macOS 下必须 `CGO_ENABLED=0` 构建（Makefile 已默认设置），否则可能遇到 dyld LC_UUID 错误。
+> On macOS, `CGO_ENABLED=0` is required (already set in Makefile) to avoid dyld LC_UUID errors.
 
-### 跨平台构建
+### Cross-platform build
 
-CI 会自动构建以下平台的二进制文件：
+CI automatically builds binaries for the following platforms:
 
-- `linux/amd64`、`linux/arm64`
-- `darwin/amd64`、`darwin/arm64`
+- `linux/amd64`, `linux/arm64`
+- `darwin/amd64`, `darwin/arm64`
 - `windows/amd64`
 
-## 快速开始
+## Quick start
 
-### 1. 登录
+### 1. Login
 
 ```bash
-elements auth login                          # 默认登录中国区 (iot.inhand.com.cn)
-elements auth login --host global            # 登录全球区 (iot.inhandnetworks.com)
-elements auth login --host iot.example.com   # 自定义域名
-elements auth login --context prod           # 创建/更新指定 context
+devicemanager auth login                          # Login to China region (iot.inhand.com.cn)
+devicemanager auth login --host global            # Login to global region (iot.inhandnetworks.com)
+devicemanager auth login --host iot.example.com   # Custom domain
+devicemanager auth login --context prod           # Create/update a named context
 ```
 
-登录使用 OAuth 2.0 Authorization Code 流程，会自动打开浏览器完成授权。
+Login uses the OAuth 2.0 Authorization Code flow — it opens a browser for authorization. The CLI reuses the platform's SPA OAuth client. A local callback server (default `http://localhost:18920/callback`) receives the authorization code and exchanges it for a token automatically.
 
-CLI 复用平台前端的 SPA OAuth client，登录回调由本地启动的回调服务（默认 `http://localhost:18920/callback`）接收授权码，并自动换取 Token。
-
-### 2. 验证
+### 2. Verify
 
 ```bash
-elements auth status
-elements device list
+devicemanager auth status
+devicemanager device list
 ```
 
-## 命令速查
+## Command reference
 
-### 认证
+### Authentication
 
 ```bash
-elements auth login                    # Browser-based OAuth login
-elements auth status                   # View current auth status
-elements auth logout                   # Log out
+devicemanager auth login                    # Browser-based OAuth login
+devicemanager auth status                   # View current auth status
+devicemanager auth logout                   # Log out
 ```
 
-### Context 管理
+### Context management
 
-Context 在登录时通过 `--context` 创建/更新。其他子命令用于切换、查看、删除：
+Contexts are created/updated at login via `--context`. Other subcommands are for switching, viewing, and deleting:
 
 ```bash
-elements config use-context <name>
-elements config current-context
-elements config list-contexts
-elements config delete-context <name>
+devicemanager config use-context <name>
+devicemanager config current-context
+devicemanager config list-contexts
+devicemanager config delete-context <name>
 ```
 
-### API 调用
+### API calls
 
 ```bash
-elements api /api/users/this                                 # GET 请求
-elements api /api/devices -q page=0 -q limit=10              # 带 query params
-elements api /api/devices -X POST -f name=test               # POST body fields
-echo '{}' | elements api /api/devices -X POST --input -      # 从 stdin 读取 JSON body
-elements api /api/users/this -H "Sudo: user@example.com"     # 自定义 header
+devicemanager api /api/users/this                                 # GET request
+devicemanager api /api/devices -q page=0 -q limit=10              # With query params
+devicemanager api /api/devices -X POST -f name=test               # POST with body fields
+echo '{}' | devicemanager api /api/devices -X POST --input -      # Read JSON body from stdin
+devicemanager api /api/users/this -H "Sudo: user@example.com"     # Custom header
 ```
 
-### 设备管理
+### Device management
 
 ```bash
-elements device list                                          # 列设备（默认 limit 20）
-elements device list --online 1 --model IR615                 # 按状态/型号过滤
-elements device list --name router-01 --serial-number GL5022  # 按名称/SN 过滤
-elements device list --cursor 20 --limit 50                   # 分页：跳过 20 条，取 50 条
-elements device list --verbose 100 -o json                    # 完整字段 + JSON 输出
+devicemanager device list                                          # List devices (default limit 20)
+devicemanager device list --online 1 --model IR615                 # Filter by status/model
+devicemanager device list --name router-01 --serial-number GL5022  # Filter by name/SN
+devicemanager device list --cursor 20 --limit 50                   # Pagination: skip 20, take 50
+devicemanager device list --verbose 100 -o json                    # Full fields + JSON output
 
-elements device get <device-id> --verbose 100                 # 设备详情
-elements device create --name <name> --serial-number <sn>     # 添加设备
-elements device signal <device-id> --after <ISO> --before <ISO>  # 历史信号质量
-elements device kick <device-id>                              # 强制断开
-elements device reboot <device-id> --timeout 15000            # 重启（毫秒）
+devicemanager device get <device-id> --verbose 100                 # Device details
+devicemanager device create --name <name> --serial-number <sn>     # Add a device
+devicemanager device signal <device-id> --after <ISO> --before <ISO>  # Signal quality history
+devicemanager device kick <device-id>                              # Force disconnect
+devicemanager device reboot <device-id> --timeout 15000            # Reboot (milliseconds)
 
-# 设备流量
-elements device traffic monthly 202604 --device <device-id>   # 查询月流量
-elements device traffic daily 202604 <device-id>              # 查询日流量
+# Device traffic
+devicemanager device traffic monthly 202604 --device <device-id>   # Monthly traffic
+devicemanager device traffic daily 202604 <device-id>              # Daily traffic
 
-# 设备客户端
-elements device clients list <device-id>                      # 列设备接入的客户端
-elements device clients batch <device-id>...                  # 批量查询客户端
+# Device clients
+devicemanager device clients list <device-id>                      # List connected clients
+devicemanager device clients batch <device-id>...                  # Batch query clients
 
-# 设备告警
-elements device alert                                         # 列告警
-elements device alert --device-name router --state unconfirmed # 按条件过滤
+# Device alerts
+devicemanager device alert                                         # List alerts
+devicemanager device alert --device-name router --state unconfirmed # Filter by condition
 
-# 设备配置
-elements device config get <device-id>                        # 获取运行配置
-elements device config set <device-id> --content "..."        # 下发配置
+# Device configuration
+devicemanager device config get <device-id>                        # Get running config
+devicemanager device config set <device-id> --content "..."        # Push configuration
 ```
 
-### 设备分组 (`devicegroup`, `dg`)
+### Device groups (`devicegroup`, `dg`)
 
 ```bash
-elements devicegroup list                                     # 列分组
-elements devicegroup list --parent <parent-id>                # 按父分组过滤
-elements devicegroup get <group-id>                           # 分组详情
-elements devicegroup create --name "Factory A"                # 创建分组
-elements devicegroup create --name "Line 1" --parent <id>     # 创建子分组
-elements devicegroup update <group-id> --name "New Name"      # 更新分组名
-elements devicegroup delete <group-id>                        # 删除分组
+devicemanager devicegroup list                                     # List groups
+devicemanager devicegroup list --parent <parent-id>                # Filter by parent group
+devicemanager devicegroup get <group-id>                           # Group details
+devicemanager devicegroup create --name "Factory A"                # Create a group
+devicemanager devicegroup create --name "Line 1" --parent <id>     # Create a subgroup
+devicemanager devicegroup update <group-id> --name "New Name"      # Rename a group
+devicemanager devicegroup delete <group-id>                        # Delete a group
 
-# 分组内设备管理
-elements devicegroup devices <group-id> list                  # 列分组内设备
-elements devicegroup devices <group-id> list --recursive      # 包含子分组设备
-elements devicegroup devices <group-id> add <device-id>...    # 添加设备到分组
-elements devicegroup devices <group-id> remove <device-id>... # 从分组移除设备
-elements devicegroup devices <group-id> available             # 可添加到分组的设备
+# Devices within a group
+devicemanager devicegroup devices <group-id> list                  # List devices in group
+devicemanager devicegroup devices <group-id> list --recursive      # Include subgroup devices
+devicemanager devicegroup devices <group-id> add <device-id>...    # Add devices to group
+devicemanager devicegroup devices <group-id> remove <device-id>... # Remove devices from group
+devicemanager devicegroup devices <group-id> available             # Devices available to add
 ```
 
-### 远程隧道 (`tunnel`)
+### Remote tunnels (`tunnel`)
 
 ```bash
-elements tunnel list                                          # 列隧道
-elements tunnel list --device-id <id>                         # 按设备过滤
-elements tunnel create \
+devicemanager tunnel list                                          # List tunnels
+devicemanager tunnel list --device-id <id>                         # Filter by device
+devicemanager tunnel create \
   --name ssh-tunnel \
   --device-id <id> \
   --proto tcp \
   --local-address 127.0.0.1 \
-  --local-port 22               # 创建隧道
-elements tunnel update <tunnel-id> --name "new-name"          # 更新隧道
-elements tunnel delete <tunnel-id>                            # 删除隧道
-elements tunnel connect <tunnel-id>                           # 连接隧道
-elements tunnel disconnect <tunnel-id>                        # 断开隧道
+  --local-port 22               # Create a tunnel
+devicemanager tunnel update <tunnel-id> --name "new-name"          # Update tunnel
+devicemanager tunnel delete <tunnel-id>                            # Delete tunnel
+devicemanager tunnel connect <tunnel-id>                           # Connect tunnel
+devicemanager tunnel disconnect <tunnel-id>                        # Disconnect tunnel
 ```
 
-### DRC 配置模板 (`drc`)
+### DRC configuration templates (`drc`)
 
 ```bash
-elements drc list                                             # 列配置模板
-elements drc list --model IR615                               # 按设备型号过滤
-elements drc get <template-id>                                # 模板详情
-elements drc create \
+devicemanager drc list                                             # List templates
+devicemanager drc list --model IR615                               # Filter by device model
+devicemanager drc get <template-id>                                # Template details
+devicemanager drc create \
   --name "IR615-default" \
   --model IR615 \
-  --content "..."               # 创建模板
-elements drc delete <template-id>                             # 删除模板
+  --content "..."               # Create a template
+devicemanager drc delete <template-id>                             # Delete a template
 
-# 模板设备管理
-elements drc devices <template-id> list                       # 列已分配设备
-elements drc devices <template-id> list --status running      # 按状态过滤
-elements drc devices <template-id> add <device-id>...         # 分配设备
-elements drc devices <template-id> add <device-id> --group <group-id>  # 分配设备组
-elements drc devices <template-id> remove <device-id>         # 移除设备
-elements drc devices <template-id> restart <device-id>        # 重启设备任务
+# Template device management
+devicemanager drc devices <template-id> list                       # List assigned devices
+devicemanager drc devices <template-id> list --status running      # Filter by status
+devicemanager drc devices <template-id> add <device-id>...         # Assign devices
+devicemanager drc devices <template-id> add <device-id> --group <group-id>  # Assign device group
+devicemanager drc devices <template-id> remove <device-id>         # Remove a device
+devicemanager drc devices <template-id> restart <device-id>        # Restart device task
 ```
 
-### 边缘计算 (`edge`)
+### Edge computing (`edge`)
 
-#### 边缘引擎 (`edge agent`)
+#### Edge engines (`edge agent`)
 
 ```bash
-elements edge agent list                                # 列引擎
-elements edge agent list --version v1.0                 # 按版本过滤
-elements edge agent get <agent-id>                       # 引擎详情
-elements edge agent upload <file-path> --description "IR615 engine"  # 上传引擎
-elements edge agent update <agent-id> --description "new desc"       # 更新引擎
-elements edge agent delete <agent-id>                    # 删除引擎
-elements edge agent devices <agent-id>                   # 已部署设备列表
-elements edge agent devices <agent-id> --status READY    # 按状态过滤
+devicemanager edge agent list                                # List engines
+devicemanager edge agent list --version v1.0                 # Filter by version
+devicemanager edge agent get <agent-id>                       # Engine details
+devicemanager edge agent upload <file-path> --description "IR615 engine"  # Upload engine
+devicemanager edge agent update <agent-id> --description "new desc"       # Update engine
+devicemanager edge agent delete <agent-id>                    # Delete engine
+devicemanager edge agent devices <agent-id>                   # List deployed devices
+devicemanager edge agent devices <agent-id> --status READY    # Filter by status
 ```
 
-#### 边缘应用 (`edge app`)
+#### Edge applications (`edge app`)
 
 ```bash
-elements edge app list                                   # 列应用
-elements edge app get <app-id>                           # 应用详情
-elements edge app create --name "my-app" --description "..."          # 创建应用
-elements edge app update <app-id> --description "new desc"           # 更新应用
-elements edge app delete <app-id>                        # 删除应用
+devicemanager edge app list                                   # List applications
+devicemanager edge app get <app-id>                           # Application details
+devicemanager edge app create --name "my-app" --description "..."          # Create application
+devicemanager edge app update <app-id> --description "new desc"           # Update application
+devicemanager edge app delete <app-id>                        # Delete application
 ```
 
-#### 应用版本 (`edge version`)
+#### Application versions (`edge version`)
 
 ```bash
-elements edge version list <app-id>                      # 列版本
-elements edge version upload <file-path> --app <app-id>  # 上传版本
-elements edge version update <app-id> <version> --notes "Release notes"  # 更新日志
-elements edge version delete <app-id> <version>          # 删除版本
-elements edge version deploy <app-id> <version> --device <id> --group <id>  # 部署版本
+devicemanager edge version list <app-id>                      # List versions
+devicemanager edge version upload <file-path> --app <app-id>  # Upload version
+devicemanager edge version update <app-id> <version> --notes "Release notes"  # Update notes
+devicemanager edge version delete <app-id> <version>          # Delete version
+devicemanager edge version deploy <app-id> <version> --device <id> --group <id>  # Deploy version
 ```
 
-#### 应用配置 (`edge config`)
+#### Application configuration (`edge config`)
 
 ```bash
-elements edge config list <app-id>                       # 列配置
-elements edge config list <app-id> --version v1.0        # 按版本过滤
-elements edge config get <app-id> <config-id>            # 配置详情
-elements edge config create <app-id> --version v1.0 --content "..."    # 创建配置
-elements edge config update <app-id> <config-id> --description "..."   # 更新配置
-elements edge config delete <app-id> <config-id>         # 删除配置
-elements edge config deploy <app-id> <version> --device <id> --group <id>  # 部署配置
+devicemanager edge config list <app-id>                       # List configs
+devicemanager edge config list <app-id> --version v1.0        # Filter by version
+devicemanager edge config get <app-id> <config-id>            # Config details
+devicemanager edge config create <app-id> --version v1.0 --content "..."    # Create config
+devicemanager edge config update <app-id> <config-id> --description "..."   # Update config
+devicemanager edge config delete <app-id> <config-id>         # Delete config
+devicemanager edge config deploy <app-id> <version> --device <id> --group <id>  # Deploy config
 ```
 
-#### 远程控制 (`edge control`)
+#### Remote control (`edge control`)
 
 ```bash
-elements edge control start <device-id> <app-id>         # 启动应用
-elements edge control stop <device-id> <app-id>          # 停止应用
-elements edge control restart <device-id> <app-id>       # 重启应用
+devicemanager edge control start <device-id> <app-id>         # Start application
+devicemanager edge control stop <device-id> <app-id>          # Stop application
+devicemanager edge control restart <device-id> <app-id>       # Restart application
 ```
 
-### 固件管理 (`firmware`)
+### Firmware management (`firmware`)
 
 ```bash
-elements firmware list                                      # 列固件
-elements firmware list --model IR615                        # 按型号过滤
-elements firmware upload <file-path>                        # 上传固件文件
-elements firmware create \
+devicemanager firmware list                                      # List firmware
+devicemanager firmware list --model IR615                        # Filter by model
+devicemanager firmware upload <file-path>                        # Upload firmware file
+devicemanager firmware create \
   --fid <file-id> \
   --name "IR615-v2.0" \
   --version 2.0.0 \
-  --model IR615             # 创建固件记录
-elements firmware upgrade <device-id> --firmware-id <id>    # 单台设备升级
+  --model IR615             # Create firmware record
+devicemanager firmware upgrade <device-id> --firmware-id <id>    # Upgrade a single device
 
-# 批量升级管理
-elements firmware devices <firmware-id> list                # 列升级任务中的设备
-elements firmware devices <firmware-id> add <device-id>...  # 批量添加设备升级
-elements firmware devices <firmware-id> add --group <group-id>...  # 按组升级
-elements firmware devices <firmware-id> remove <device-id>  # 取消设备升级
+# Batch upgrade management
+devicemanager firmware devices <firmware-id> list                # List devices in upgrade task
+devicemanager firmware devices <firmware-id> add <device-id>...  # Add devices for batch upgrade
+devicemanager firmware devices <firmware-id> add --group <group-id>...  # Upgrade by group
+devicemanager firmware devices <firmware-id> remove <device-id>  # Cancel device upgrade
 ```
 
-### 调试
+### Debugging
 
 ```bash
-elements device list --debug                              # 输出 config/auth/HTTP 调试信息到 stderr
-ELEMENTS_DEBUG=1 elements device list                     # 通过环境变量开启
-elements device list --debug -o json 2>/tmp/debug.log     # 调试信息写文件，不影响 stdout
+devicemanager device list --debug                              # Print config/auth/HTTP debug info to stderr
+DEVICEMANAGER_DEBUG=1 devicemanager device list                     # Enable via environment variable
+devicemanager device list --debug -o json 2>/tmp/debug.log     # Write debug to file, keep stdout clean
 ```
 
-### 全局 Flag
+### Global flags
 
 ```bash
-elements --context prod auth status            # 临时切换 context
-elements --debug device list                   # 开启调试输出
-elements --jq '.[].name' device list           # 用 jq 表达式过滤 JSON
-elements version                                # 查看版本
+devicemanager --context prod auth status            # Temporarily switch context
+devicemanager --debug device list                   # Enable debug output
+devicemanager --jq '.[].name' device list           # Filter JSON with jq expression
+devicemanager version                                # Show version info
 ```
 
-## 输出格式
+## Output formats
 
-通过 `-o` 指定输出格式：
+Use `-o` to specify the output format:
 
-| 格式 | TTY 行为 | 管道行为 |
-|------|---------|---------|
-| `json`（默认） | 彩色 pretty JSON | 紧凑 JSON |
-| `table` | 对齐表格 | TSV |
+| Format | TTY behavior | Pipe behavior |
+|--------|-------------|---------------|
+| `json` (default) | Colorized pretty JSON | Compact JSON |
+| `table` | Aligned table | TSV |
 | `yaml` | YAML | YAML |
 
 ```bash
-elements device list -o table                   # 表格输出
-elements device list -o yaml                    # YAML 输出
-elements device list --jq '.[] | .name'         # 通过 jq 表达式过滤
+devicemanager device list -o table                   # Table output
+devicemanager device list -o yaml                    # YAML output
+devicemanager device list --jq '.[] | .name'         # Filter with jq expression
 ```
 
-服务端返回的 `{"result": ...}` 信封会在 yaml/json/jq 模式下自动剥掉，只保留 `result` 内的内容。
+The `{"result": ...}` envelope from the server is automatically unwrapped in yaml/json/jq modes — only the contents of `result` are shown.
 
-### 字段筛选（`--verbose`）
+### Field verbosity (`--verbose`)
 
-DM API 用 `verbose` 参数控制返回字段的详尽程度（1-100，越高越详细）：
+The DM API uses a `verbose` parameter to control how many fields are returned (1-100, higher = more detailed):
 
 ```bash
-elements device list --verbose 10                # 默认列表字段
-elements device list --verbose 100 -o json       # 完整字段
-elements device get <id> --verbose 100           # 获取设备完整详情
+devicemanager device list --verbose 10                # Default list fields
+devicemanager device list --verbose 100 -o json       # All fields
+devicemanager device get <id> --verbose 100           # Full device details
 ```
 
-### 分页
+### Pagination
 
 ```bash
-elements device list --cursor 0 --limit 20       # 第一页（默认）
-elements device list --cursor 20 --limit 50      # 跳过 20 条，取 50 条
+devicemanager device list --cursor 0 --limit 20       # First page (default)
+devicemanager device list --cursor 20 --limit 50      # Skip 20, take 50
 ```
 
-DM 平台使用 `cursor`（skip 偏移）+ `limit` 分页。`list` 命令也接受 `--page-size`/`--per-page` 作为 `--limit` 的隐藏别名。
+The DM platform uses `cursor` (skip offset) + `limit` pagination. The `list` commands also accept `--page-size`/`--per-page` as hidden aliases for `--limit`.
 
-## 环境变量
+## Environment variables
 
-| 变量 | 作用 |
-|------|------|
-| `ELEMENTS_CONTEXT` | 覆盖当前 context |
-| `ELEMENTS_HOST` | 覆盖 context 中的 host |
-| `ELEMENTS_TOKEN` | 覆盖 context 中的 token |
-| `ELEMENTS_DEBUG` | 设为任意非空值开启调试输出 |
+| Variable | Purpose |
+|----------|---------|
+| `DEVICEMANAGER_CONTEXT` | Override the current context |
+| `DEVICEMANAGER_HOST` | Override the host in the current context |
+| `DEVICEMANAGER_TOKEN` | Override the token in the current context |
+| `DEVICEMANAGER_DEBUG` | Set to any non-empty value to enable debug output |
 
-## 配置文件
+## Configuration file
 
-路径：`~/.config/elements/config.yaml`（权限 `0600`）
+Path: `~/.config/devicemanager/config.yaml` (permissions `0600`)
 
-配置文件存储所有 context 信息（host、token 等），通过 `elements config` 子命令管理。
+The configuration file stores all context information (host, token, etc.) and is managed via the `devicemanager config` subcommands.
 
-## 开发指南
+## Development
 
-### 前置依赖
+### Prerequisites
 
-- Go 1.24+
+- Go 1.25+
 - [golangci-lint](https://golangci-lint.run/)
-- [goimports](https://pkg.go.dev/golang.org/x/tools/cmd/goimports)
 
-### 构建 & 测试
+### Build & test
 
 ```bash
-make build       # 构建到 bin/elements
-make build-all   # 跨平台构建
-make install     # 安装到 GOPATH
-make test        # 运行测试
-make fmt         # gofmt -w .
-make lint        # 运行 golangci-lint
-make clean       # 清理构建产物
+make build       # Build to bin/devicemanager
+make build-all   # Cross-platform build
+make install     # Install to GOPATH
+make test        # Run tests
+make fmt         # Format code (gofmt + goimports)
+make lint        # Run golangci-lint
+make clean       # Clean build artifacts
 ```
 
-### 项目结构
+### Project structure
 
 ```
-cmd/elements/       # CLI 入口
+cmd/devicemanager/       # CLI entry point
 internal/
-  api/              # OAuth 认证、Token 传输与自动刷新、REST 客户端、回调服务
-  build/            # 注入 Version/Commit/Date
-  cmd/              # 各子命令实现
-    auth/           # 登录、登出、认证状态
-    config/         # Context 管理
-    device/         # 设备管理
-    devicegroup/    # 设备分组管理
-    tunnel/         # 远程隧道管理
-    drc/            # DRC 配置模板管理
-    edge/           # 边缘计算（引擎/应用/版本/配置/控制）
-    firmware/       # 固件管理与升级
-    version/        # 版本信息
-  cmdutil/          # 通用 list flag（cursor/limit/verbose）、query 构建
-  config/           # 配置文件读写、Context 模型
-  debug/            # 调试输出（--debug / ELEMENTS_DEBUG）
-  factory/          # 依赖注入工厂
-  iostreams/        # 终端输出、格式化（JSON/Table/YAML/jq）
+  api/              # OAuth, token transport & auto-refresh, REST client, callback server
+  build/            # Injected Version/Commit/Date
+  cmd/              # Subcommand implementations
+    auth/           # Login, logout, auth status
+    config/         # Context management
+    device/         # Device management
+    devicegroup/    # Device group management
+    tunnel/         # Remote tunnel management
+    drc/            # DRC configuration template management
+    edge/           # Edge computing (engine/app/version/config/control)
+    firmware/       # Firmware management & upgrades
+    version/        # Version info
+  cmdutil/          # Shared list flags (cursor/limit/verbose), query builder
+  config/           # Config file I/O, context model
+  debug/            # Debug output (--debug / DEVICEMANAGER_DEBUG)
+  factory/          # Dependency injection factory
+  iostreams/        # Terminal output, formatters (JSON/Table/YAML/jq)
 ```

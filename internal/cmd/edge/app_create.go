@@ -5,15 +5,15 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 func newCmdAppCreate(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create",
 		Short:   "Create an edge app",
-		Example: `  elements edge app create --name "my-app" --description "My edge app"`,
+		Example: `  devicemanager edge app create --name "my-app" --description "My edge app"`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

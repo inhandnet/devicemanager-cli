@@ -14,25 +14,25 @@ type Config struct {
 }
 
 func (cfg *Config) ActiveContext() (*Context, error) {
-	name := os.Getenv("ELEMENTS_CONTEXT")
+	name := os.Getenv("DEVICEMANAGER_CONTEXT")
 	if name == "" {
 		name = cfg.CurrentContext
 	}
 	if name == "" {
-		return nil, fmt.Errorf("no active context; run 'elements auth login' or 'elements config use-context <name>'")
+		return nil, fmt.Errorf("no active context; run 'devicemanager auth login' or 'devicemanager config use-context <name>'")
 	}
 	ctx, ok := cfg.Contexts[name]
 	if !ok {
 		return nil, fmt.Errorf("context %q not found in config", name)
 	}
-	if h := os.Getenv("ELEMENTS_HOST"); h != "" {
+	if h := os.Getenv("DEVICEMANAGER_HOST"); h != "" {
 		ctx.Host = h
 	}
 	return ctx, nil
 }
 
 func (cfg *Config) ActiveContextName() string {
-	if name := os.Getenv("ELEMENTS_CONTEXT"); name != "" {
+	if name := os.Getenv("DEVICEMANAGER_CONTEXT"); name != "" {
 		return name
 	}
 	return cfg.CurrentContext
@@ -40,7 +40,7 @@ func (cfg *Config) ActiveContextName() string {
 
 func DefaultPath() string {
 	dir, _ := os.UserConfigDir()
-	return filepath.Join(dir, "elements", "config.yaml")
+	return filepath.Join(dir, "devicemanager", "config.yaml")
 }
 
 func Load(path string) (*Config, error) {

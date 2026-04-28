@@ -9,9 +9,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	inapi "github.com/inhandnet/elements-cli/internal/api"
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	inapi "github.com/inhandnet/devicemanager-cli/internal/api"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 type ApiOptions struct {
@@ -36,27 +36,27 @@ func NewCmdApi(f *factory.Factory) *cobra.Command {
 The path is appended to the current context's host URL.
 Authorization header is automatically injected.`,
 		Example: `  # GET current user
-  elements api /api/users/this
+  devicemanager api /api/users/this
 
   # List devices with query params
-  elements api /api/devices -q page=0 -q limit=10
+  devicemanager api /api/devices -q page=0 -q limit=10
 
   # Output formats
-  elements api /api/devices -o json
-  elements api /api/devices -o table -c name -c online
-  elements api /api/devices -o yaml
+  devicemanager api /api/devices -o json
+  devicemanager api /api/devices -o table -c name -c online
+  devicemanager api /api/devices -o yaml
 
   # Create device
-  elements api /api/devices -X POST -f name=test -f serialNumber=SN001
+  devicemanager api /api/devices -X POST -f name=test -f serialNumber=SN001
 
   # POST with JSON from stdin
-  echo '{"name":"test"}' | elements api /api/devices -X POST --input -
+  echo '{"name":"test"}' | devicemanager api /api/devices -X POST --input -
 
   # Custom header
-  elements api /api/users/this -H "Sudo: user@example.com"
+  devicemanager api /api/users/this -H "Sudo: user@example.com"
 
   # Download a file
-  elements api /api/devices/DEVICE_ID/files/capture_result.pcap --output-file capture.pcap`,
+  devicemanager api /api/devices/DEVICE_ID/files/capture_result.pcap --output-file capture.pcap`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.Path = args[0]

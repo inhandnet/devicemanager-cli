@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 type CreateOptions struct {
@@ -24,7 +24,7 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create",
 		Short:   "Create a firmware entry",
-		Example: `  elements firmware create --fid <file-id> --name "IR615-v2.0" --version 2.0.0 --model IR615`,
+		Example: `  devicemanager firmware create --fid <file-id> --name "IR615-v2.0" --version 2.0.0 --model IR615`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

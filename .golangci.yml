@@ -10,7 +10,7 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/inhandnet/elements-cli
+        - github.com/inhandnet/devicemanager-cli
 
 linters:
   default: none

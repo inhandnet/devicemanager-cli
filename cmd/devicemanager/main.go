@@ -6,19 +6,19 @@ import (
 	"os"
 	"strings"
 
-	"github.com/inhandnet/elements-cli/internal/api"
-	cmd "github.com/inhandnet/elements-cli/internal/cmd"
-	apiCmd "github.com/inhandnet/elements-cli/internal/cmd/api"
-	authCmd "github.com/inhandnet/elements-cli/internal/cmd/auth"
-	configCmd "github.com/inhandnet/elements-cli/internal/cmd/config"
-	deviceCmd "github.com/inhandnet/elements-cli/internal/cmd/device"
-	devicegroupCmd "github.com/inhandnet/elements-cli/internal/cmd/devicegroup"
-	drcCmd "github.com/inhandnet/elements-cli/internal/cmd/drc"
-	edgeCmd "github.com/inhandnet/elements-cli/internal/cmd/edge"
-	firmwareCmd "github.com/inhandnet/elements-cli/internal/cmd/firmware"
-	tunnelCmd "github.com/inhandnet/elements-cli/internal/cmd/tunnel"
-	versionCmd "github.com/inhandnet/elements-cli/internal/cmd/version"
-	"github.com/inhandnet/elements-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/api"
+	cmd "github.com/inhandnet/devicemanager-cli/internal/cmd"
+	apiCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/api"
+	authCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/auth"
+	configCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/config"
+	deviceCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/device"
+	devicegroupCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/devicegroup"
+	drcCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/drc"
+	edgeCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/edge"
+	firmwareCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/firmware"
+	tunnelCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/tunnel"
+	versionCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/version"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
 )
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 	rootCmd.AddCommand(firmwareCmd.NewCmdFirmware(f))
 	rootCmd.AddCommand(versionCmd.NewCmdVersion(f))
 
-	// Top-level shortcut: `elements login` → `elements auth login`
+	// Top-level shortcut: `devicemanager login` → `devicemanager auth login`
 	loginAlias := authCmd.NewCmdLogin(f)
 	loginAlias.Use = "login"
 	loginAlias.Hidden = true
@@ -50,7 +50,7 @@ func main() {
 		}
 		var httpErr *api.HTTPError
 		if errors.As(err, &httpErr) && httpErr.StatusCode == 401 {
-			fmt.Fprintln(os.Stderr, "Hint: run 'elements auth login' to re-authenticate")
+			fmt.Fprintln(os.Stderr, "Hint: run 'devicemanager auth login' to re-authenticate")
 		}
 		os.Exit(1)
 	}

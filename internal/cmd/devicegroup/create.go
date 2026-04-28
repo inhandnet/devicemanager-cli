@@ -3,8 +3,8 @@ package devicegroup
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 type CreateOptions struct {
@@ -18,8 +18,8 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a device group",
-		Example: `  elements devicegroup create --name "Factory A"
-  elements devicegroup create --name "Line 1" --parent <group-id>`,
+		Example: `  devicemanager devicegroup create --name "Factory A"
+  devicemanager devicegroup create --name "Line 1" --parent <group-id>`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

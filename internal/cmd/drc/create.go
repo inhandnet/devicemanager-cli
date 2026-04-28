@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 type CreateOptions struct {
@@ -23,7 +23,7 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create",
 		Short:   "Create a DRC template",
-		Example: `  elements drc create --name "IR615-default" --model IR615 --content "..."`,
+		Example: `  devicemanager drc create --name "IR615-default" --model IR615 --content "..."`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

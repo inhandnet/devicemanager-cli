@@ -3,7 +3,7 @@ package auth
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
 )
 
 func NewCmdAuth(f *factory.Factory) *cobra.Command {

@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 func NewCmdConfig(f *factory.Factory) *cobra.Command {
@@ -26,7 +26,7 @@ func NewCmdConfigGet(f *factory.Factory) *cobra.Command {
 		Use:     "get <device-id>",
 		Short:   "Get device running configuration",
 		Args:    cobra.ExactArgs(1),
-		Example: `  elements device config get <device-id>`,
+		Example: `  devicemanager device config get <device-id>`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -52,8 +52,8 @@ func NewCmdConfigSet(f *factory.Factory) *cobra.Command {
 		Use:   "set <device-id>",
 		Short: "Set device configuration",
 		Args:  cobra.ExactArgs(1),
-		Example: `  elements device config set <device-id> --content "..."
-  elements device config set <device-id> --content-file config.json`,
+		Example: `  devicemanager device config set <device-id> --content "..."
+  devicemanager device config set <device-id> --content-file config.json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

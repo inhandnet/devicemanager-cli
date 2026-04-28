@@ -11,10 +11,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/api"
-	"github.com/inhandnet/elements-cli/internal/config"
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/api"
+	"github.com/inhandnet/devicemanager-cli/internal/config"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 const defaultCallbackPort = 18920
@@ -33,13 +33,13 @@ func NewCmdLogin(f *factory.Factory) *cobra.Command {
 		Use:   "login",
 		Short: "Login via browser",
 		Example: `  # Login via browser (default) — opens DM login page
-  elements auth login
+  devicemanager auth login
 
   # Login to global region
-  elements auth login --host global
+  devicemanager auth login --host global
 
   # Login with a custom domain
-  elements auth login --host iot.example.com`,
+  devicemanager auth login --host iot.example.com`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runBrowserLogin(f, opts)
 		},
@@ -85,7 +85,7 @@ func runBrowserLogin(f *factory.Factory, opts *LoginOptions) error {
 		return fmt.Errorf("fetching OAuth config from %s: %w", apiURL, err)
 	}
 
-	state := fmt.Sprintf("elements-cli-%d", time.Now().UnixNano())
+	state := fmt.Sprintf("devicemanager-cli-%d", time.Now().UnixNano())
 	redirectURI := fmt.Sprintf("http://localhost:%d/callback", opts.Port)
 
 	loginURL := fmt.Sprintf("https://%s/user/login?redirect_uri=%s&state=%s",

@@ -17,7 +17,7 @@ type Context struct {
 }
 
 func (c *Context) EffectiveToken() string {
-	if t := os.Getenv("ELEMENTS_TOKEN"); t != "" {
+	if t := os.Getenv("DEVICEMANAGER_TOKEN"); t != "" {
 		return t
 	}
 	return c.Token

@@ -3,7 +3,7 @@ package tunnel
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
 )
 
 func NewCmdTunnel(f *factory.Factory) *cobra.Command {

@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 func NewCmdUpgrade(f *factory.Factory) *cobra.Command {
@@ -14,7 +14,7 @@ func NewCmdUpgrade(f *factory.Factory) *cobra.Command {
 		Use:     "upgrade <device-id>",
 		Short:   "Upgrade a single device",
 		Args:    cobra.ExactArgs(1),
-		Example: `  elements firmware upgrade <device-id> --firmware-id <id> --timeout 600`,
+		Example: `  devicemanager firmware upgrade <device-id> --firmware-id <id> --timeout 600`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

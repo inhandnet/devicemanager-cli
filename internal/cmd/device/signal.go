@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 func NewCmdSignal(f *factory.Factory) *cobra.Command {
@@ -16,7 +16,7 @@ func NewCmdSignal(f *factory.Factory) *cobra.Command {
 		Use:   "signal <device-id>",
 		Short: "Query historical signal quality",
 		Args:  cobra.ExactArgs(1),
-		Example: `  elements device signal 5e6f222afbcf3e0001e133f4 \
+		Example: `  devicemanager device signal 5e6f222afbcf3e0001e133f4 \
     --after 2024-01-01T00:00:00Z --before 2024-01-02T00:00:00Z`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()

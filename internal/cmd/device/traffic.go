@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 func NewCmdTraffic(f *factory.Factory) *cobra.Command {
@@ -27,8 +27,8 @@ func NewCmdTrafficMonthly(f *factory.Factory) *cobra.Command {
 		Use:   "monthly <month>",
 		Short: "Query monthly traffic for devices (YYYYMM)",
 		Args:  cobra.ExactArgs(1),
-		Example: `  elements device traffic monthly 202604 --device <device-id>
-  elements device traffic monthly 202604 --device <id1> --device <id2>`,
+		Example: `  devicemanager device traffic monthly 202604 --device <device-id>
+  devicemanager device traffic monthly 202604 --device <id1> --device <id2>`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -64,7 +64,7 @@ func NewCmdTrafficDaily(f *factory.Factory) *cobra.Command {
 		Use:     "daily <month> <device-id>",
 		Short:   "Query daily traffic for a device (YYYYMM)",
 		Args:    cobra.ExactArgs(2),
-		Example: `  elements device traffic daily 202604 <device-id>`,
+		Example: `  devicemanager device traffic daily 202604 <device-id>`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

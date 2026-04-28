@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 func NewCmdGet(f *factory.Factory) *cobra.Command {
@@ -17,7 +17,7 @@ func NewCmdGet(f *factory.Factory) *cobra.Command {
 		Short: "Get device details",
 		Args:  cobra.ExactArgs(1),
 		Example: `  # Get full device details
-  elements device get 5d6349d6335c8c000178a194 --verbose 100`,
+  devicemanager device get 5d6349d6335c8c000178a194 --verbose 100`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

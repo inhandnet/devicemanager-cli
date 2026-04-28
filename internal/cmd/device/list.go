@@ -5,9 +5,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/elements-cli/internal/cmdutil"
-	"github.com/inhandnet/elements-cli/internal/factory"
-	"github.com/inhandnet/elements-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/cmdutil"
+	"github.com/inhandnet/devicemanager-cli/internal/factory"
+	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 type ListOptions struct {
@@ -26,13 +26,13 @@ func NewCmdList(f *factory.Factory) *cobra.Command {
 		Short:   "List devices",
 		Aliases: []string{"ls"},
 		Example: `  # List all online devices
-  elements device list --online 1
+  devicemanager device list --online 1
 
   # Filter by model
-  elements device list --model IR615
+  devicemanager device list --model IR615
 
   # List with full details
-  elements device list --verbose 100 -o json`,
+  devicemanager device list --verbose 100 -o json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

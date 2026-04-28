@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/inhandnet/elements-cli/internal/debug"
+	"github.com/inhandnet/devicemanager-cli/internal/debug"
 )
 
 // CallbackResult holds the authorization code received from the OAuth2 callback.
