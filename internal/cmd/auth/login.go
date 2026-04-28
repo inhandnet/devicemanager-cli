@@ -139,8 +139,9 @@ func saveLogin(f *factory.Factory, opts *LoginOptions, host, username, clientID,
 	}
 
 	// Fetch current user info from API
-	if user := fetchCurrentUser(ctx); user != "" {
+	if user, authority := fetchCurrentUser(ctx); user != "" {
 		ctx.User = user
+		ctx.Authority = authority
 	}
 
 	cfg.SetContext(opts.ContextName, ctx)
@@ -156,28 +157,30 @@ func saveLogin(f *factory.Factory, opts *LoginOptions, host, username, clientID,
 	return nil
 }
 
-// fetchCurrentUser calls /api/users/this to get the logged-in user's display name.
-func fetchCurrentUser(ctx *config.Context) string {
+// fetchCurrentUser calls /api/users/this to get the logged-in user's display name and authority.
+func fetchCurrentUser(ctx *config.Context) (string, string) {
 	transport := &api.TokenTransport{
 		Token: ctx.Token,
 		Base:  http.DefaultTransport,
 	}
 	client := api.NewAPIClient(ctx.APIURL(), transport)
 	q := url.Values{}
-	q.Set("verbose", "10")
+	q.Set("verbose", "100")
 	body, err := client.Get("/api/users/this", q)
 	if err != nil {
-		return ""
+		return "", ""
 	}
 	var resp struct {
 		Result struct {
-			Name  string `json:"name"`
-			Email string `json:"email"`
-			Phone string `json:"phone"`
+			Name     string `json:"name"`
+			Email    string `json:"email"`
+			Phone    string `json:"phone"`
+			RoleName string `json:"roleName"`
+			IsRoot   bool   `json:"isRoot"`
 		} `json:"result"`
 	}
 	if json.Unmarshal(body, &resp) != nil {
-		return ""
+		return "", ""
 	}
 	name := resp.Result.Name
 	if name == "" {
@@ -187,9 +190,15 @@ func fetchCurrentUser(ctx *config.Context) string {
 		name = resp.Result.Phone
 	}
 	if resp.Result.Email != "" {
-		return fmt.Sprintf("%s (%s)", name, resp.Result.Email)
+		name = fmt.Sprintf("%s (%s)", name, resp.Result.Email)
 	}
-	return name
+
+	authority := resp.Result.RoleName
+	if resp.Result.IsRoot {
+		authority = "root"
+	}
+
+	return name, authority
 }
 
 // openBrowser tries to open a URL in the default browser.

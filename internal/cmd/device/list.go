@@ -46,6 +46,15 @@ func NewCmdList(f *factory.Factory) *cobra.Command {
 			cmdutil.SetQueryParam(q, "online", opts.Online)
 			cmdutil.SetQueryParam(q, "serial_number", opts.SerialNumber)
 
+			// Auto-set sudo for admin/technical support users
+			if cfg, _ := f.Config(); cfg != nil {
+				if ctx := cfg.Contexts[cfg.CurrentContext]; ctx != nil {
+					if ctx.Authority == "root" || ctx.Authority == "TechnicalSupport" {
+						q.Set("sudo", "true")
+					}
+				}
+			}
+
 			output, _ := cmd.Flags().GetString("output")
 
 			body, err := client.Get("/api/devices", q)
