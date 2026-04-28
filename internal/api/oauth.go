@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,11 +11,55 @@ import (
 	"time"
 )
 
-// DM platform OAuth client credentials
-const (
-	DMClientID     = "17953450251798098136"
-	DMClientSecret = "08E9EC6793345759456CB8BAE52615F3"
-)
+// OAuthClient holds the client_id and client_secret from the platform.
+type OAuthClient struct {
+	ClientID     string
+	ClientSecret string
+}
+
+// FetchOAuthClient retrieves OAuth client_id and client_secret from the platform's
+// public configuration API: GET /api/platform/config
+func FetchOAuthClient(ctx context.Context, host string) (*OAuthClient, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, host+"/api/platform/config", http.NoBody)
+	if err != nil {
+		return nil, fmt.Errorf("creating request: %w", err)
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("fetching platform config: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("platform config HTTP %d: %s", resp.StatusCode, string(body))
+	}
+
+	var config struct {
+		Result struct {
+			Auth struct {
+				ClientID     json.Number `json:"clientId"`
+				ClientSecret string      `json:"clientSecret"`
+			} `json:"auth"`
+		} `json:"result"`
+	}
+	if err := json.Unmarshal(body, &config); err != nil {
+		return nil, fmt.Errorf("parsing platform config: %w", err)
+	}
+
+	clientID := config.Result.Auth.ClientID.String()
+	if clientID == "" {
+		return nil, fmt.Errorf("clientId not found in platform config")
+	}
+
+	return &OAuthClient{
+		ClientID:     clientID,
+		ClientSecret: config.Result.Auth.ClientSecret,
+	}, nil
+}
 
 // OAuthToken holds the token response from DM platform.
 type OAuthToken struct {
@@ -26,12 +71,12 @@ type OAuthToken struct {
 }
 
 // RefreshAccessToken uses the refresh_token to obtain a new access_token.
-func RefreshAccessToken(host, refreshToken string) (*OAuthToken, error) {
+func RefreshAccessToken(host, clientID, clientSecret, refreshToken string) (*OAuthToken, error) {
 	data := url.Values{
 		"grant_type":    {"refresh_token"},
 		"refresh_token": {refreshToken},
-		"client_id":     {DMClientID},
-		"client_secret": {DMClientSecret},
+		"client_id":     {clientID},
+		"client_secret": {clientSecret},
 	}
 
 	resp, err := http.Post(host+"/oauth2/access_token", "application/x-www-form-urlencoded", strings.NewReader(data.Encode()))

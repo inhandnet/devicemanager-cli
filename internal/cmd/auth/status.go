@@ -44,7 +44,13 @@ func NewCmdStatus(f *factory.Factory) *cobra.Command {
 			tokenExpired := !ctx.ExpiresAt.IsZero() && ctx.ExpiresAt.Before(time.Now())
 
 			if tokenExpired && ctx.RefreshToken != "" {
-				newToken, err := api.RefreshAccessToken(ctx.APIURL(), ctx.RefreshToken)
+				clientID, clientSecret := ctx.ClientID, ctx.ClientSecret
+				if clientID == "" || clientSecret == "" {
+					if c, err := api.FetchOAuthClient(cmd.Context(), ctx.APIURL()); err == nil {
+						clientID, clientSecret = c.ClientID, c.ClientSecret
+					}
+				}
+				newToken, err := api.RefreshAccessToken(ctx.APIURL(), clientID, clientSecret, ctx.RefreshToken)
 				if err == nil {
 					ctx.Token = newToken.AccessToken
 					if newToken.RefreshToken != "" {

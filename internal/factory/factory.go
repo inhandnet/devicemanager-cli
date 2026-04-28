@@ -81,6 +81,8 @@ func (f *Factory) newTransport(ctx *config.Context) *api.TokenTransport {
 		Token:        ctx.EffectiveToken(),
 		RefreshToken: ctx.RefreshToken,
 		Host:         ctx.APIURL(),
+		ClientID:     ctx.ClientID,
+		ClientSecret: ctx.ClientSecret,
 		OnRefresh: func(accessToken, refreshToken string, expiry time.Time) {
 			ctx.Token = accessToken
 			if refreshToken != "" {

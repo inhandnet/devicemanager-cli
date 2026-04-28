@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -76,6 +77,14 @@ func runBrowserLogin(f *factory.Factory, opts *LoginOptions) error {
 		return err
 	}
 
+	apiURL := "https://" + host
+
+	fmt.Fprintln(out, "Fetching OAuth client configuration...")
+	oauthClient, err := api.FetchOAuthClient(context.Background(), apiURL)
+	if err != nil {
+		return fmt.Errorf("fetching OAuth config from %s: %w", apiURL, err)
+	}
+
 	state := fmt.Sprintf("elements-cli-%d", time.Now().UnixNano())
 	redirectURI := fmt.Sprintf("http://localhost:%d/callback", opts.Port)
 
@@ -103,15 +112,15 @@ func runBrowserLogin(f *factory.Factory, opts *LoginOptions) error {
 
 	fmt.Fprintln(out, "Exchanging authorization code...")
 
-	token, err := api.ExchangeCodeForToken("https://"+host, result.Code, api.DMClientID, api.DMClientSecret, redirectURI)
+	token, err := api.ExchangeCodeForToken("https://"+host, result.Code, oauthClient.ClientID, oauthClient.ClientSecret, redirectURI)
 	if err != nil {
 		return err
 	}
 
-	return saveLogin(f, opts, host, "", token)
+	return saveLogin(f, opts, host, "", oauthClient.ClientID, oauthClient.ClientSecret, token)
 }
 
-func saveLogin(f *factory.Factory, opts *LoginOptions, host, username string, token *api.OAuthToken) error {
+func saveLogin(f *factory.Factory, opts *LoginOptions, host, username, clientID, clientSecret string, token *api.OAuthToken) error {
 	cfg, err := f.Config()
 	if err != nil {
 		return err
@@ -122,6 +131,8 @@ func saveLogin(f *factory.Factory, opts *LoginOptions, host, username string, to
 		Token:        token.AccessToken,
 		RefreshToken: token.RefreshToken,
 		User:         username,
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
 	}
 	if !token.ExpiresAt.IsZero() {
 		ctx.ExpiresAt = token.ExpiresAt
