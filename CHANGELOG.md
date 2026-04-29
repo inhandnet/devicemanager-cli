@@ -1,3 +1,24 @@
+# v0.1.2 (2026-04-29)
+
+## New Features
+
+### Confirmation Prompts
+- Add interactive confirmation for all destructive operations (delete, remove, kick, reboot)
+- Use `--yes/-y` to skip confirmation in scripts/CI
+- Non-TTY environments (pipes) automatically skip confirmation
+
+### Output
+- TTY-adaptive default output format: `table` in terminal, `json` when piped
+- Replace hardcoded ANSI colors with termenv-based Colorizer that auto-disables in non-TTY
+- Add column formatters: `FormatBytes`, `FormatDuration`, `FormatRelativeTime`, `FormatPercent`, `TruncateRunes`
+- Add `WithTransform` and `WithFormatters` FormatOption for table data transformation
+- Add `normalizePage` to convert 0-based page numbers to 1-based
+
+### API
+- Add `ResultIDName` helper to extract `_id` and `name` from standard API responses
+
+---
+
 # v0.1.1 (2026-04-29)
 
 ## Improvements
