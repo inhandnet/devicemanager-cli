@@ -66,8 +66,8 @@ jobs:
           AWS_DEFAULT_REGION: cn-north-1
         run: |
           TAG=${{ github.ref_name }}
-          BUCKET=incloud-cli-releases
-          PREFIX=inhandnet/devicemanager-cli
+          BUCKET=elms-dm5-iot
+          PREFIX=devicemanager-cli
 
           # Upload binaries and checksums
           aws s3 cp bin/ "s3://${BUCKET}/${PREFIX}/${TAG}/" \

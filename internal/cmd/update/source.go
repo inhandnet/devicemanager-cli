@@ -11,7 +11,7 @@ import (
 
 const (
 	githubTimeout = 8 * time.Second
-	mirrorBaseURL = "https://incloud-cli-releases.s3.cn-north-1.amazonaws.com.cn/inhandnet/devicemanager-cli"
+	mirrorBaseURL = "https://elms-dm5-iot.s3.cn-north-1.amazonaws.com.cn/devicemanager-cli"
 )
 
 // newSource creates a fallbackSource: GitHub (8s timeout) → S3 mirror.
