@@ -89,7 +89,7 @@ func runUpdate(ctx context.Context, f *factory.Factory, opts updateOptions) erro
 
 	fmt.Fprintf(io.ErrOut, "Checking for updates... current: %s\n", currentVer)
 
-	source, err := selfupdate.NewGitHubSource(selfupdate.GitHubConfig{})
+	source, err := newSource(io.ErrOut)
 	if err != nil {
 		return fmt.Errorf("initializing update source: %w", err)
 	}
