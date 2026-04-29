@@ -105,7 +105,7 @@ devicemanager device config get <device-id>                        # Get running
 devicemanager device config set <device-id> --content "..."        # Push configuration
 ```
 
-### Device groups (`devicegroup`, `dg`)
+### Device groups
 
 ```bash
 devicemanager devicegroup list                                     # List groups
@@ -124,7 +124,7 @@ devicemanager devicegroup devices <group-id> remove <device-id>... # Remove devi
 devicemanager devicegroup devices <group-id> available             # Devices available to add
 ```
 
-### Remote tunnels (`tunnel`)
+### Remote tunnels
 
 ```bash
 devicemanager tunnel list                                          # List tunnels
@@ -141,7 +141,7 @@ devicemanager tunnel connect <tunnel-id>                           # Connect tun
 devicemanager tunnel disconnect <tunnel-id>                        # Disconnect tunnel
 ```
 
-### DRC configuration templates (`drc`)
+### DRC configuration templates
 
 ```bash
 devicemanager drc list                                             # List templates
@@ -162,9 +162,9 @@ devicemanager drc devices <template-id> remove <device-id>         # Remove a de
 devicemanager drc devices <template-id> restart <device-id>        # Restart device task
 ```
 
-### Edge computing (`edge`)
+### Edge computing
 
-#### Edge engines (`edge agent`)
+#### Edge engines
 
 ```bash
 devicemanager edge agent list                                # List engines
@@ -177,7 +177,7 @@ devicemanager edge agent devices <agent-id>                   # List deployed de
 devicemanager edge agent devices <agent-id> --status READY    # Filter by status
 ```
 
-#### Edge applications (`edge app`)
+#### Edge applications
 
 ```bash
 devicemanager edge app list                                   # List applications
@@ -187,7 +187,7 @@ devicemanager edge app update <app-id> --description "new desc"           # Upda
 devicemanager edge app delete <app-id>                        # Delete application
 ```
 
-#### Application versions (`edge version`)
+#### Application versions
 
 ```bash
 devicemanager edge version list <app-id>                      # List versions
@@ -197,7 +197,7 @@ devicemanager edge version delete <app-id> <version>          # Delete version
 devicemanager edge version deploy <app-id> <version> --device <id> --group <id>  # Deploy version
 ```
 
-#### Application configuration (`edge config`)
+#### Application configuration
 
 ```bash
 devicemanager edge config list <app-id>                       # List configs
@@ -209,7 +209,7 @@ devicemanager edge config delete <app-id> <config-id>         # Delete config
 devicemanager edge config deploy <app-id> <version> --device <id> --group <id>  # Deploy config
 ```
 
-#### Remote control (`edge control`)
+#### Remote control
 
 ```bash
 devicemanager edge control start <device-id> <app-id>         # Start application
@@ -217,7 +217,7 @@ devicemanager edge control stop <device-id> <app-id>          # Stop application
 devicemanager edge control restart <device-id> <app-id>       # Restart application
 ```
 
-### Firmware management (`firmware`)
+### Firmware management
 
 ```bash
 devicemanager firmware list                                      # List firmware

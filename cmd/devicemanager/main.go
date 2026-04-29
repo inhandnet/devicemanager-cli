@@ -17,6 +17,7 @@ import (
 	edgeCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/edge"
 	firmwareCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/firmware"
 	tunnelCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/tunnel"
+	updateCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/update"
 	versionCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/version"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 )
@@ -33,6 +34,7 @@ func main() {
 	rootCmd.AddCommand(drcCmd.NewCmdDRC(f))
 	rootCmd.AddCommand(edgeCmd.NewCmdEdge(f))
 	rootCmd.AddCommand(firmwareCmd.NewCmdFirmware(f))
+	rootCmd.AddCommand(updateCmd.NewCmdUpdate(f))
 	rootCmd.AddCommand(versionCmd.NewCmdVersion(f))
 
 	// Top-level shortcut: `devicemanager login` → `devicemanager auth login`
