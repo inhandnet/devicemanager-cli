@@ -19,7 +19,7 @@ func NewCmdRoot(f *factory.Factory) *cobra.Command {
 		Version:       build.Version,
 	}
 
-	cmd.PersistentFlags().StringP("output", "o", "json", "Output format: json, table, yaml")
+	cmd.PersistentFlags().StringP("output", "o", "", "Output format: json, table, yaml (default: table for TTY, json otherwise)")
 	cmd.PersistentFlags().String("jq", "", `Filter JSON output using a jq expression (implies -o json)`)
 	cmd.PersistentFlags().String("context", "", "Override active context (env: DEVICEMANAGER_CONTEXT)")
 	cmd.PersistentFlags().Bool("debug", false, "Enable debug output (env: DEVICEMANAGER_DEBUG)")
@@ -31,9 +31,22 @@ func NewCmdRoot(f *factory.Factory) *cobra.Command {
 			debug.Enabled = true
 		}
 
+		outputExplicit := cmd.Flags().Changed("output")
+
 		if jqExpr, _ := cmd.Flags().GetString("jq"); jqExpr != "" {
 			f.IO.JQExpr = jqExpr
-			_ = cmd.Flags().Set("output", "json")
+			if !outputExplicit {
+				_ = cmd.Flags().Set("output", "json")
+			}
+		}
+
+		// Set default output format based on TTY
+		if output, _ := cmd.Flags().GetString("output"); output == "" {
+			if f.IO.IsStdoutTTY() {
+				_ = cmd.Flags().Set("output", "table")
+			} else {
+				_ = cmd.Flags().Set("output", "json")
+			}
 		}
 
 		if ctx, _ := cmd.Flags().GetString("context"); ctx != "" {

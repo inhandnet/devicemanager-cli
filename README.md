@@ -258,12 +258,12 @@ devicemanager version                                # Show version info
 
 ## Output formats
 
-Use `-o` to specify the output format:
+Use `-o` to specify the output format. Default is `table` in a terminal and `json` when piped.
 
 | Format | TTY behavior | Pipe behavior |
 |--------|-------------|---------------|
-| `json` (default) | Colorized pretty JSON | Compact JSON |
 | `table` | Aligned table | TSV |
+| `json` | Colorized pretty JSON | Compact JSON |
 | `yaml` | YAML | YAML |
 
 ```bash

@@ -7,14 +7,21 @@ import (
 
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/ui"
 )
 
 func newCmdAgentDelete(f *factory.Factory) *cobra.Command {
+	var yes bool
+
 	cmd := &cobra.Command{
 		Use:   "delete <agent-id>",
 		Short: "Delete an edge agent",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if !ui.Confirm(f.IO, fmt.Sprintf("Delete edge agent %s?", args[0]), yes) {
+				return nil
+			}
+
 			client, err := f.APIClient()
 			if err != nil {
 				return err
@@ -31,6 +38,8 @@ func newCmdAgentDelete(f *factory.Factory) *cobra.Command {
 			return iostreams.FormatOutput(resp, f.IO, output)
 		},
 	}
+
+	cmd.Flags().BoolVarP(&yes, "yes", "y", false, "Skip confirmation prompt")
 
 	return cmd
 }

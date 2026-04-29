@@ -7,21 +7,28 @@ import (
 
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/ui"
 )
 
 func NewCmdDevicesRemove(f *factory.Factory) *cobra.Command {
+	var yes bool
+
 	cmd := &cobra.Command{
 		Use:   "remove <firmware-id> <device-id>",
 		Short: "Cancel a device firmware upgrade task",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			firmwareID := args[0]
+			deviceID := args[1]
+
+			if !ui.Confirm(f.IO, fmt.Sprintf("Cancel upgrade for device %s?", deviceID), yes) {
+				return nil
+			}
+
 			client, err := f.APIClient()
 			if err != nil {
 				return err
 			}
-
-			firmwareID := args[0]
-			deviceID := args[1]
 
 			output, _ := cmd.Flags().GetString("output")
 
@@ -34,6 +41,8 @@ func NewCmdDevicesRemove(f *factory.Factory) *cobra.Command {
 			return iostreams.FormatOutput(resp, f.IO, output)
 		},
 	}
+
+	cmd.Flags().BoolVarP(&yes, "yes", "y", false, "Skip confirmation prompt")
 
 	return cmd
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/inhandnet/devicemanager-cli/internal/build"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
+	"github.com/inhandnet/devicemanager-cli/internal/ui"
 )
 
 const (
@@ -133,7 +134,7 @@ func runUpdate(ctx context.Context, f *factory.Factory, opts updateOptions) erro
 		fmt.Fprintf(io.ErrOut, "\nRelease notes:\n%s\n", latest.ReleaseNotes)
 	}
 
-	if cancelled := confirmUpdate(io, opts.skipConfirm); cancelled {
+	if !ui.Confirm(io, "Download and install?", opts.skipConfirm) {
 		return nil
 	}
 
@@ -154,27 +155,11 @@ func updateToVersion(ctx context.Context, io *iostreams.IOStreams, updater *self
 	fmt.Fprintf(io.ErrOut, "Found version: %s (released %s)\n",
 		release.Version(), release.PublishedAt.Format("2006-01-02"))
 
-	if cancelled := confirmUpdate(io, opts.skipConfirm); cancelled {
+	if !ui.Confirm(io, "Download and install?", opts.skipConfirm) {
 		return nil
 	}
 
 	return doUpdate(ctx, io, updater, release)
-}
-
-// confirmUpdate prompts the user unless skipConfirm is set or stdout is not a TTY.
-// Returns true if the user cancelled.
-func confirmUpdate(io *iostreams.IOStreams, skipConfirm bool) bool {
-	if skipConfirm || !io.IsStdoutTTY() {
-		return false
-	}
-	fmt.Fprintf(io.ErrOut, "\nDownload and install? [Y/n] ")
-	var answer string
-	_, _ = fmt.Fscanln(io.In, &answer)
-	if answer != "" && answer != "y" && answer != "Y" && answer != "yes" {
-		fmt.Fprintln(io.ErrOut, "Update cancelled.")
-		return true
-	}
-	return false
 }
 
 func doUpdate(ctx context.Context, io *iostreams.IOStreams, updater *selfupdate.Updater, release *selfupdate.Release) error {
