@@ -1,3 +1,16 @@
+# v0.1.1 (2026-04-29)
+
+## Improvements
+
+### Self-Update
+- Add S3 mirror (cn-north-1) as automatic fallback when GitHub is unreachable, improving update reliability for users in China
+
+### Device Traffic
+- Add `devicemanager device traffic hourly` command for hour-level traffic queries with `--after`/`--before` date range support (max 6 days)
+- Simplify `traffic monthly` command: replace `--device` flag with positional `<device-id>` argument, consistent with `daily` and `hourly`
+
+---
+
 # v0.1.0 (2026-04-29)
 
 Initial public release of the Device Manager CLI.
