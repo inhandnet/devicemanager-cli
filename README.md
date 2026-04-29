@@ -89,8 +89,10 @@ devicemanager device kick <device-id>                              # Force disco
 devicemanager device reboot <device-id> --timeout 15000            # Reboot (milliseconds)
 
 # Device traffic
-devicemanager device traffic monthly 202604 --device <device-id>   # Monthly traffic
+devicemanager device traffic monthly 202604 <device-id>            # Monthly traffic
 devicemanager device traffic daily 202604 <device-id>              # Daily traffic
+devicemanager device traffic hourly <device-id>                    # Hourly traffic (last 24h)
+devicemanager device traffic hourly <device-id> --after 2026-04-25 --before 2026-04-27  # Custom range (max 6 days)
 
 # Device clients
 devicemanager device clients list <device-id>                      # List connected clients
