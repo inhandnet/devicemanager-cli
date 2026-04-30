@@ -1,3 +1,42 @@
+# v0.2.0 (2026-04-30)
+
+## New Features
+
+### Device Update & Delete
+- Add `device update` command to edit device name and description
+- Add `device delete` command to remove devices (with confirmation prompt)
+
+### Alert Rules
+- Add `device alert-rule` command group with full CRUD: `list`, `get`, `create`, `update`, `delete`
+- Add `device alert-rule enable/disable` to toggle rules on/off
+- Add `device alert-ack` to acknowledge (confirm) alerts
+
+### Online Statistics
+- Add `device online-stats` command to query device online rate, max online/offline duration, login count
+- Accepts `--device-id` (repeatable) with `--start-time`/`--end-time` date range
+
+### Task Management
+- Add `task list` command for unified view of all tasks (DRC, firmware, etc.) with status/type/device filtering
+- Add `task cancel` and `task restart` commands
+
+### Device Diagnostics
+- Add `device online-events` command to view device online/offline event timeline for troubleshooting disconnections
+- Add `device register-events` command to view device registration history by serial number
+- Add `edge app logs` command to view edge application runtime logs on a device
+
+### System Management
+- Add `system` command group with `user`, `permission`, `org`, and `log` subcommands
+- `system user list/get/create/update/delete` — organization user management
+- `system permission list/get/create/update/delete/users/devices` — device permission group management
+- `system org get/update` — organization info
+- `system log list` — audit log query with date range and level filtering
+
+### Documentation
+- Add `INSTALL.md` — AI-executable installation guide for automated CLI setup (platform detection, download with S3 China mirror fallback, checksum verification, install, login)
+- Add `cmd/docgen` for auto-generating command reference markdown docs
+
+---
+
 # v0.1.2 (2026-04-29)
 
 ## New Features

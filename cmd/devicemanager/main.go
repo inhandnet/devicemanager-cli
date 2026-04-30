@@ -16,6 +16,8 @@ import (
 	drcCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/drc"
 	edgeCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/edge"
 	firmwareCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/firmware"
+	systemCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/system"
+	taskCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/task"
 	tunnelCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/tunnel"
 	updateCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/update"
 	versionCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/version"
@@ -34,6 +36,8 @@ func main() {
 	rootCmd.AddCommand(drcCmd.NewCmdDRC(f))
 	rootCmd.AddCommand(edgeCmd.NewCmdEdge(f))
 	rootCmd.AddCommand(firmwareCmd.NewCmdFirmware(f))
+	rootCmd.AddCommand(taskCmd.NewCmdTask(f))
+	rootCmd.AddCommand(systemCmd.NewCmdSystem(f))
 	rootCmd.AddCommand(updateCmd.NewCmdUpdate(f))
 	rootCmd.AddCommand(versionCmd.NewCmdVersion(f))
 

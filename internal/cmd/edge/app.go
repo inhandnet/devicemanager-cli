@@ -17,6 +17,7 @@ func newCmdApp(f *factory.Factory) *cobra.Command {
 	cmd.AddCommand(newCmdAppCreate(f))
 	cmd.AddCommand(newCmdAppUpdate(f))
 	cmd.AddCommand(newCmdAppDelete(f))
+	cmd.AddCommand(newCmdAppLogs(f))
 
 	return cmd
 }

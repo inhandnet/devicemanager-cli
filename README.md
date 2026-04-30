@@ -98,9 +98,40 @@ devicemanager device traffic hourly <device-id> --after 2026-04-25 --before 2026
 devicemanager device clients list <device-id>                      # List connected clients
 devicemanager device clients batch <device-id>...                  # Batch query clients
 
+# Device update & delete
+devicemanager device update <device-id> --name "new-name"          # Rename device
+devicemanager device update <device-id> --description "office"     # Update description
+devicemanager device delete <device-id>                            # Delete a device
+
 # Device alerts
 devicemanager device alert                                         # List alerts
 devicemanager device alert --device-name router --state unconfirmed # Filter by condition
+devicemanager device alert-ack <alert-id>                          # Acknowledge an alert
+
+# Alert rules
+devicemanager device alert-rule list                               # List alert rules
+devicemanager device alert-rule list --device-name router          # Filter by device
+devicemanager device alert-rule get <rule-id>                      # Rule details
+devicemanager device alert-rule create \
+  --name "offline-alert" \
+  --metric online \
+  --condition eq \
+  --threshold 0                # Create an alert rule
+devicemanager device alert-rule update <rule-id> --name "new-name" # Update rule
+devicemanager device alert-rule enable <rule-id>                   # Enable rule
+devicemanager device alert-rule disable <rule-id>                  # Disable rule
+devicemanager device alert-rule delete <rule-id>                   # Delete rule
+
+# Online statistics
+devicemanager device online-stats \
+  --device-id <id> \
+  --start-time 2026-04-23 \
+  --end-time 2026-04-30        # Query online stats (rate, durations, etc.)
+
+# Device event logs (for troubleshooting)
+devicemanager device online-events <device-id> \
+  --start-time 2026-04-29 --end-time 2026-04-30                   # Online/offline event timeline
+devicemanager device register-events <serial-number>               # Registration event history
 
 # Device configuration
 devicemanager device config get <device-id>                        # Get running config
@@ -187,6 +218,7 @@ devicemanager edge app get <app-id>                           # Application deta
 devicemanager edge app create --name "my-app" --description "..."          # Create application
 devicemanager edge app update <app-id> --description "new desc"           # Update application
 devicemanager edge app delete <app-id>                        # Delete application
+devicemanager edge app logs <device-id> <app-name>            # View app runtime logs on device
 ```
 
 #### Application versions
@@ -217,6 +249,60 @@ devicemanager edge config deploy <app-id> <version> --device <id> --group <id>  
 devicemanager edge control start <device-id> <app-id>         # Start application
 devicemanager edge control stop <device-id> <app-id>          # Stop application
 devicemanager edge control restart <device-id> <app-id>       # Restart application
+```
+
+### Task management
+
+```bash
+devicemanager task list                                            # List all tasks
+devicemanager task list --status running                           # Filter by status (running/waiting/failed/completed)
+devicemanager task list --type firmware_upgrade                    # Filter by task type
+devicemanager task list --device-name router                       # Filter by device name
+devicemanager task cancel <task-id>                                # Cancel a task
+devicemanager task restart <task-id>                               # Restart a task
+```
+
+### System management
+
+#### Users
+
+```bash
+devicemanager system user list                                     # List users in organization
+devicemanager system user get <user-id>                            # User details
+devicemanager system user create \
+  --name "test" \
+  --email "test@example.com" \
+  --password "123456"          # Create a user
+devicemanager system user update <user-id> --name "new-name"       # Update user
+devicemanager system user update <user-id> --role "device_monitor"  # Change role
+devicemanager system user delete <user-id>                         # Delete user
+```
+
+#### Device permissions
+
+```bash
+devicemanager system permission list                               # List permission groups
+devicemanager system permission get <group-id>                     # Group details
+devicemanager system permission create --name "office-devices"     # Create permission group
+devicemanager system permission update <group-id> --name "new"     # Update group
+devicemanager system permission delete <group-id>                  # Delete group
+devicemanager system permission users <group-id>                   # List users in group
+devicemanager system permission devices <group-id>                 # List devices in group
+```
+
+#### Organization
+
+```bash
+devicemanager system org get                                       # View current org info
+devicemanager system org update <org-id> --name "New Org Name"     # Update org info
+```
+
+#### Audit logs
+
+```bash
+devicemanager system log list                                      # List recent audit logs
+devicemanager system log list --start-time 2026-04-24 --end-time 2026-04-30  # Filter by date
+devicemanager system log list --level warning                      # Filter by level
 ```
 
 ### Firmware management
@@ -343,6 +429,8 @@ internal/
     drc/            # DRC configuration template management
     edge/           # Edge computing (engine/app/version/config/control)
     firmware/       # Firmware management & upgrades
+    task/           # Task management (unified DRC/firmware task view)
+    system/         # System management (users, permissions, org, audit logs)
     version/        # Version info
   cmdutil/          # Shared list flags (cursor/limit/verbose), query builder
   config/           # Config file I/O, context model
