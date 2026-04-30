@@ -71,6 +71,8 @@ func NewCmdStatus(f *factory.Factory) *cobra.Command {
 					fmt.Fprintf(out, "Status:   %s\n", iostreams.Red("not logged in"))
 				case tokenExpired:
 					fmt.Fprintf(out, "Status:   %s\n", iostreams.Red("token expired, please login again"))
+				case ctx.IsImpersonating():
+					fmt.Fprintf(out, "Status:   %s\n", iostreams.Yellow("logged in (impersonating)"))
 				default:
 					fmt.Fprintf(out, "Status:   %s\n", iostreams.Green("logged in"))
 				}

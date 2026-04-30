@@ -14,6 +14,16 @@ type Context struct {
 	ExpiresAt    time.Time `yaml:"expires_at,omitempty"`
 	ClientID     string    `yaml:"client_id,omitempty"`
 	ClientSecret string    `yaml:"client_secret,omitempty"`
+
+	// Impersonate: backup of admin token while impersonating another user
+	AdminToken        string    `yaml:"admin_token,omitempty"`
+	AdminRefreshToken string    `yaml:"admin_refresh_token,omitempty"`
+	AdminExpiresAt    time.Time `yaml:"admin_expires_at,omitempty"`
+}
+
+// IsImpersonating returns true if currently impersonating another user.
+func (c *Context) IsImpersonating() bool {
+	return c.AdminToken != ""
 }
 
 func (c *Context) EffectiveToken() string {

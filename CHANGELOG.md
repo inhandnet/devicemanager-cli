@@ -19,6 +19,13 @@
 - Add `task list` command for unified view of all tasks (DRC, firmware, etc.) with status/type/device filtering
 - Add `task cancel` and `task restart` commands
 
+### Impersonate & Organization Switching
+- Add `auth impersonate` command to impersonate another user (requires ROOT privilege)
+- Supports `--user` (auto-resolves internal org), `--org` (auto-resolves org admin), or both
+- `--stop` to restore admin identity; `auth status` shows impersonation state
+- Add `auth orgs` to list organizations you belong to
+- Add `auth switch-org <org-id>` to switch to a different organization
+
 ### Device Diagnostics
 - Add `device online-events` command to view device online/offline event timeline for troubleshooting disconnections
 - Add `device register-events` command to view device registration history by serial number
