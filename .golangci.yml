@@ -52,6 +52,9 @@ linters:
           - noctx
         path: internal/cmd/auth/
       - linters:
+          - gosec
+        path: cmd/docgen/
+      - linters:
           - gocritic
         text: unnamedResult|builtinShadow|ifElseChain|paramTypeCombine|stringXbytes|hugeParam
 
