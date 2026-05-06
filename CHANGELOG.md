@@ -1,3 +1,16 @@
+# v0.2.1 (2026-05-06)
+
+## New Features
+
+### Impersonate & Organization Switching
+- Add `auth impersonate` command to impersonate another user (requires ROOT privilege)
+- Supports `--user` (auto-resolves internal org), `--org` (auto-resolves org admin), or both
+- `--stop` to restore admin identity; `auth status` shows impersonation state
+- Add `auth orgs` to list organizations you belong to
+- Add `auth switch-org <org-id>` to switch to a different organization
+
+---
+
 # v0.2.0 (2026-04-30)
 
 ## New Features
