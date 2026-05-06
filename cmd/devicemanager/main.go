@@ -13,6 +13,7 @@ import (
 	configCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/config"
 	deviceCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/device"
 	devicegroupCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/devicegroup"
+	docsCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/docs"
 	drcCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/drc"
 	edgeCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/edge"
 	firmwareCmd "github.com/inhandnet/devicemanager-cli/internal/cmd/firmware"
@@ -38,6 +39,7 @@ func main() {
 	rootCmd.AddCommand(firmwareCmd.NewCmdFirmware(f))
 	rootCmd.AddCommand(taskCmd.NewCmdTask(f))
 	rootCmd.AddCommand(systemCmd.NewCmdSystem(f))
+	rootCmd.AddCommand(docsCmd.NewCmdDocs(f))
 	rootCmd.AddCommand(updateCmd.NewCmdUpdate(f))
 	rootCmd.AddCommand(versionCmd.NewCmdVersion(f))
 

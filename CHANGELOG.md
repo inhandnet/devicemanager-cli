@@ -1,3 +1,16 @@
+# v0.2.2 (2026-05-06)
+
+## New Features
+
+### Device Documentation
+- Add `docs` command group to browse device model reference documentation from [model-reference](https://github.com/inhandnet/model-reference) repo
+- `docs list` — list available models or model-specific document index
+- `docs get <path>` — fetch a specific document, supports `--model` prefix
+- `docs search <keyword>` — search across root and model indexes with structured output
+- Override default repo via `DEVICEMANAGER_DOCS_REPO` environment variable
+
+---
+
 # v0.2.1 (2026-05-06)
 
 ## New Features
