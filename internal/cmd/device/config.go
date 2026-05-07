@@ -17,6 +17,7 @@ func NewCmdConfig(f *factory.Factory) *cobra.Command {
 
 	cmd.AddCommand(NewCmdConfigGet(f))
 	cmd.AddCommand(NewCmdConfigSet(f))
+	cmd.AddCommand(NewCmdConfigExport(f))
 
 	return cmd
 }
@@ -101,4 +102,27 @@ func NewCmdConfigSet(f *factory.Factory) *cobra.Command {
 	cmd.Flags().String("description", "", "Configuration description")
 
 	return cmd
+}
+
+func NewCmdConfigExport(f *factory.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:   "export <device-id>",
+		Short: "Export device configuration",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := f.APIClient()
+			if err != nil {
+				return err
+			}
+
+			output, _ := cmd.Flags().GetString("output")
+
+			body, err := client.Get(fmt.Sprintf("/api/devices/%s/config/export", args[0]), nil)
+			if err != nil {
+				return err
+			}
+
+			return iostreams.FormatOutput(body, f.IO, output)
+		},
+	}
 }

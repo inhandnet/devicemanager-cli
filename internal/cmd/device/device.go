@@ -29,6 +29,9 @@ func NewCmdDevice(f *factory.Factory) *cobra.Command {
 	cmd.AddCommand(NewCmdAlertConfirm(f))
 	cmd.AddCommand(NewCmdOnlineEvents(f))
 	cmd.AddCommand(NewCmdRegisterEvents(f))
+	cmd.AddCommand(NewCmdModels(f))
+	cmd.AddCommand(NewCmdStats(f))
+	cmd.AddCommand(NewCmdCount(f))
 
 	return cmd
 }

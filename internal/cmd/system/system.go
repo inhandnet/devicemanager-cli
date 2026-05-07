@@ -14,6 +14,7 @@ func NewCmdSystem(f *factory.Factory) *cobra.Command {
 	}
 
 	cmd.AddCommand(NewCmdUser(f))
+	cmd.AddCommand(NewCmdRole(f))
 	cmd.AddCommand(NewCmdPermission(f))
 	cmd.AddCommand(NewCmdOrg(f))
 	cmd.AddCommand(NewCmdLog(f))

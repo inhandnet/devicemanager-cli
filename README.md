@@ -89,6 +89,8 @@ devicemanager device list --verbose 100 -o json                    # Full fields
 
 devicemanager device get <device-id> --verbose 100                 # Device details
 devicemanager device create --name <name> --serial-number <sn>     # Add a device
+devicemanager device models                                        # List supported device models
+devicemanager device stats                                         # Device overview (online/total counts)
 devicemanager device signal <device-id> --after <ISO> --before <ISO>  # Signal quality history
 devicemanager device kick <device-id>                              # Force disconnect
 devicemanager device reboot <device-id> --timeout 15000            # Reboot (milliseconds)
@@ -98,6 +100,12 @@ devicemanager device traffic monthly 202604 <device-id>            # Monthly tra
 devicemanager device traffic daily 202604 <device-id>              # Daily traffic
 devicemanager device traffic hourly <device-id>                    # Hourly traffic (last 24h)
 devicemanager device traffic hourly <device-id> --after 2026-04-25 --before 2026-04-27  # Custom range (max 6 days)
+devicemanager device traffic top --month 202604                    # Top devices by monthly traffic
+devicemanager device traffic top --month 202604 --limit 10         # Top 10
+
+# Device count trends
+devicemanager device count online --after 2026-04-01 --before 2026-04-30  # Online count over time
+devicemanager device count total --after 2026-04-01 --before 2026-04-30   # Total count over time
 
 # Device clients
 devicemanager device clients list <device-id>                      # List connected clients
@@ -148,6 +156,7 @@ devicemanager device register-events <serial-number>               # Registratio
 # Device configuration
 devicemanager device config get <device-id>                        # Get running config
 devicemanager device config set <device-id> --content "..."        # Push configuration
+devicemanager device config export <device-id>                     # Export configuration
 ```
 
 ### Device groups
@@ -287,9 +296,14 @@ devicemanager system user create \
 devicemanager system user create \
   --email "ext@example.com" --external     # Create an external user
 devicemanager system user update <user-id> --name "new-name"       # Update user
-devicemanager system user update <user-id> --role-id <role-id>     # Change role by ID
-devicemanager system user update <user-id> --role "device_monitor"  # Change role by name
+devicemanager system user update <user-id> --role-id <role-id>     # Change role
 devicemanager system user delete <user-id>                         # Delete user
+```
+
+#### Roles
+
+```bash
+devicemanager system role list                                     # List roles in organization
 ```
 
 #### Device permissions
@@ -303,11 +317,14 @@ devicemanager system permission update <group-id> --description "desc"  # Update
 devicemanager system permission delete <group-id>                  # Delete group
 devicemanager system permission users <group-id>                   # List users in group
 devicemanager system permission devices <group-id>                 # List devices in group
+devicemanager system permission devicegroups <group-id>            # List device groups in permission group
+devicemanager system permission unassigned-users                   # List users without a permission group
 ```
 
 #### Organization
 
 ```bash
+devicemanager system org list                                      # List organizations
 devicemanager system org get                                       # View current org info
 devicemanager system org update <org-id> --name "New Org Name"     # Update org name
 devicemanager system org update <org-id> --email "org@example.com" # Update org email
@@ -327,6 +344,7 @@ devicemanager system log list --level warning                      # Filter by l
 ```bash
 devicemanager firmware list                                      # List firmware
 devicemanager firmware list --model IR615                        # Filter by model
+devicemanager firmware get <firmware-id>                         # Firmware details
 devicemanager firmware upload <file-path>                        # Upload firmware file
 devicemanager firmware create \
   --fid <file-id> \
@@ -340,6 +358,7 @@ devicemanager firmware devices <firmware-id> list                # List devices 
 devicemanager firmware devices <firmware-id> add <device-id>...  # Add devices for batch upgrade
 devicemanager firmware devices <firmware-id> add --group <group-id>...  # Upgrade by group
 devicemanager firmware devices <firmware-id> remove <device-id>  # Cancel device upgrade
+devicemanager firmware job-stats <job-id>                        # Upgrade job statistics
 ```
 
 ### Device model documentation
@@ -461,7 +480,7 @@ internal/
     firmware/       # Firmware management & upgrades
     task/           # Task management (unified DRC/firmware task view)
     docs/           # Device model reference documentation (from GitHub)
-    system/         # System management (users, permissions, org, audit logs)
+    system/         # System management (users, roles, permissions, org, audit logs)
     version/        # Version info
   cmdutil/          # Shared list flags (cursor/limit/verbose), query builder
   config/           # Config file I/O, context model

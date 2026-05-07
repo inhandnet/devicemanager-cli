@@ -26,6 +26,8 @@ func NewCmdPermission(f *factory.Factory) *cobra.Command {
 	cmd.AddCommand(newCmdPermissionDelete(f))
 	cmd.AddCommand(newCmdPermissionUsers(f))
 	cmd.AddCommand(newCmdPermissionDevices(f))
+	cmd.AddCommand(newCmdPermissionDeviceGroups(f))
+	cmd.AddCommand(newCmdPermissionUnassignedUsers(f))
 
 	return cmd
 }
@@ -263,6 +265,71 @@ func newCmdPermissionDevices(f *factory.Factory) *cobra.Command {
 
 			return iostreams.FormatOutput(body, f.IO, output,
 				iostreams.WithColumns("_id", "name", "serialNumber", "model", "online"))
+		},
+	}
+
+	flags.Register(cmd)
+
+	return cmd
+}
+
+func newCmdPermissionDeviceGroups(f *factory.Factory) *cobra.Command {
+	var flags cmdutil.ListFlags
+
+	cmd := &cobra.Command{
+		Use:   "devicegroups <group-id>",
+		Short: "List device groups in a permission group",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := f.APIClient()
+			if err != nil {
+				return err
+			}
+
+			q := url.Values{}
+			flags.ApplyTo(q)
+
+			output, _ := cmd.Flags().GetString("output")
+
+			body, err := client.Get(fmt.Sprintf("/api/groups/%s/devicegroups", args[0]), q)
+			if err != nil {
+				return err
+			}
+
+			return iostreams.FormatOutput(body, f.IO, output,
+				iostreams.WithColumns("_id", "name"))
+		},
+	}
+
+	flags.Register(cmd)
+
+	return cmd
+}
+
+func newCmdPermissionUnassignedUsers(f *factory.Factory) *cobra.Command {
+	var flags cmdutil.ListFlags
+
+	cmd := &cobra.Command{
+		Use:   "unassigned-users",
+		Short: "List users not assigned to any permission group",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := f.APIClient()
+			if err != nil {
+				return err
+			}
+
+			q := url.Values{}
+			flags.ApplyTo(q)
+
+			output, _ := cmd.Flags().GetString("output")
+
+			body, err := client.Get("/api/groups/none/users", q)
+			if err != nil {
+				return err
+			}
+
+			return iostreams.FormatOutput(body, f.IO, output,
+				iostreams.WithColumns("_id", "name", "email", "roleName"))
 		},
 	}
 

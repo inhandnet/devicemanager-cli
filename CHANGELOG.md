@@ -1,3 +1,22 @@
+# v0.4.0 (2026-05-07)
+
+## New Features
+
+### New Query Commands
+- Add `device models` to list supported device models
+- Add `device stats` for device overview (online/total counts)
+- Add `device count online/total` for device count trends with date range
+- Add `device traffic top` for monthly traffic ranking
+- Add `device config export` to export device configuration
+- Add `firmware get` for firmware details
+- Add `firmware job-stats` for upgrade job statistics
+- Add `system role list` to list roles in organization
+- Add `system org list` to list organizations
+- Add `system permission devicegroups` to list device groups in a permission group
+- Add `system permission unassigned-users` to list users without a permission group
+
+---
+
 # v0.3.0 (2026-05-07)
 
 ## Breaking Changes

@@ -16,10 +16,38 @@ func NewCmdOrg(f *factory.Factory) *cobra.Command {
 		Short: "View and manage organization info",
 	}
 
+	cmd.AddCommand(newCmdOrgList(f))
 	cmd.AddCommand(newCmdOrgGet(f))
 	cmd.AddCommand(newCmdOrgUpdate(f))
 
 	return cmd
+}
+
+func newCmdOrgList(f *factory.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:     "list",
+		Short:   "List organizations",
+		Aliases: []string{"ls"},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := f.APIClient()
+			if err != nil {
+				return err
+			}
+
+			q := url.Values{}
+			q.Set("verbose", "100")
+
+			output, _ := cmd.Flags().GetString("output")
+
+			body, err := client.Get("/api2/organizations", q)
+			if err != nil {
+				return err
+			}
+
+			return iostreams.FormatOutput(body, f.IO, output,
+				iostreams.WithColumns("_id", "name", "email"))
+		},
+	}
 }
 
 func newCmdOrgGet(f *factory.Factory) *cobra.Command {

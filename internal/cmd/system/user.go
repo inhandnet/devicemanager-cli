@@ -92,7 +92,6 @@ func newCmdUserCreate(f *factory.Factory) *cobra.Command {
 		name     string
 		email    string
 		roleID   string
-		role     string
 		external bool
 		lang     string
 	)
@@ -126,9 +125,6 @@ func newCmdUserCreate(f *factory.Factory) *cobra.Command {
 			if roleID != "" {
 				body["roleId"] = roleID
 			}
-			if role != "" {
-				body["roleName"] = role
-			}
 			if lang != "" {
 				switch lang {
 				case "zh", "cn":
@@ -151,8 +147,7 @@ func newCmdUserCreate(f *factory.Factory) *cobra.Command {
 
 	cmd.Flags().StringVar(&name, "name", "", "User name")
 	cmd.Flags().StringVar(&email, "email", "", "User email (required)")
-	cmd.Flags().StringVar(&roleID, "role-id", "", "Role ID")
-	cmd.Flags().StringVar(&role, "role", "", "Role name")
+	cmd.Flags().StringVar(&roleID, "role-id", "", "Role ID (use 'system role list' to find IDs)")
 	cmd.Flags().BoolVar(&external, "external", false, "Create as external user")
 	cmd.Flags().StringVar(&lang, "lang", "", `Invitation email language: "en" (default) or "zh"`)
 	_ = cmd.MarkFlagRequired("email")
@@ -180,10 +175,6 @@ func newCmdUserUpdate(f *factory.Factory) *cobra.Command {
 				v, _ := cmd.Flags().GetString("role-id")
 				body["roleId"] = v
 			}
-			if cmd.Flags().Changed("role") {
-				v, _ := cmd.Flags().GetString("role")
-				body["roleName"] = v
-			}
 
 			if len(body) == 0 {
 				return fmt.Errorf("at least one flag is required")
@@ -201,8 +192,7 @@ func newCmdUserUpdate(f *factory.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().String("name", "", "New user name")
-	cmd.Flags().String("role-id", "", "New role ID")
-	cmd.Flags().String("role", "", "New role name")
+	cmd.Flags().String("role-id", "", "New role ID (use 'system role list' to find IDs)")
 
 	return cmd
 }
