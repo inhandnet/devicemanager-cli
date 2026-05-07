@@ -15,6 +15,7 @@ type CreateOptions struct {
 	Content     string
 	ContentType string
 	Desc        string
+	GroupIDs    []string
 }
 
 func NewCmdCreate(f *factory.Factory) *cobra.Command {
@@ -41,6 +42,9 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 			if opts.Desc != "" {
 				body["desc"] = opts.Desc
 			}
+			if len(opts.GroupIDs) > 0 {
+				body["groupIds"] = opts.GroupIDs
+			}
 
 			output, _ := cmd.Flags().GetString("output")
 
@@ -59,6 +63,7 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 	cmd.Flags().StringVar(&opts.Content, "content", "", "Template content (required)")
 	cmd.Flags().StringVar(&opts.ContentType, "content-type", "", "Content type")
 	cmd.Flags().StringVar(&opts.Desc, "desc", "", "Description")
+	cmd.Flags().StringSliceVar(&opts.GroupIDs, "group-ids", nil, "Permission group IDs (comma-separated)")
 	_ = cmd.MarkFlagRequired("name")
 	_ = cmd.MarkFlagRequired("model")
 	_ = cmd.MarkFlagRequired("content")

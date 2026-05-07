@@ -86,7 +86,7 @@ func NewCmdConfigSet(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Post(fmt.Sprintf("/api/devices/%s/config/set2", deviceID), body)
+			resp, err := client.Post(fmt.Sprintf("/api/devices/%s/config/set", deviceID), body)
 			if err != nil {
 				return err
 			}

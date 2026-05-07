@@ -71,6 +71,18 @@ func newCmdOrgUpdate(f *factory.Factory) *cobra.Command {
 				v, _ := cmd.Flags().GetString("contact")
 				body["contact"] = v
 			}
+			if cmd.Flags().Changed("email") {
+				v, _ := cmd.Flags().GetString("email")
+				body["email"] = v
+			}
+			if cmd.Flags().Changed("country") {
+				v, _ := cmd.Flags().GetString("country")
+				body["country"] = v
+			}
+			if cmd.Flags().Changed("biz-category") {
+				v, _ := cmd.Flags().GetString("biz-category")
+				body["bizCategory"] = v
+			}
 
 			if len(body) == 0 {
 				return fmt.Errorf("at least one flag is required")
@@ -90,6 +102,9 @@ func newCmdOrgUpdate(f *factory.Factory) *cobra.Command {
 	cmd.Flags().String("name", "", "Organization name")
 	cmd.Flags().String("address", "", "Organization address")
 	cmd.Flags().String("contact", "", "Contact information")
+	cmd.Flags().String("email", "", "Organization email")
+	cmd.Flags().String("country", "", "Country")
+	cmd.Flags().String("biz-category", "", "Business category")
 
 	return cmd
 }

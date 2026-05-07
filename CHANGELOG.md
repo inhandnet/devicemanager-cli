@@ -1,3 +1,48 @@
+# v0.3.0 (2026-05-07)
+
+## Breaking Changes
+
+### Default Login Region
+- Default `--host` changed from `cn` (iot.inhand.com.cn) to `global` (iot.inhandnetworks.com)
+
+### Alert Rule Field Model
+- `device alert-rule create` now uses `--alert-type`, `--for-device-type`, `--for-device-value`, `--notify-users`, `--notify-types`, `--notify-delay`, `--webhook-url`, `--webhook-secret`, `--locale` instead of the old `--metric`, `--condition`, `--threshold`, `--duration` flags
+- `device alert-rule update` now supports `--for-device-type`, `--for-device-value`, `--notify-users`, `--notify-types`, `--notify-delay`, `--webhook-url`, `--webhook-secret`; removed `--threshold`
+
+### User Create (Invitation Email Flow)
+- `system user create` no longer requires `--password`; users receive an invitation email to set their password
+- `--name` is now optional (not required for external users)
+- Added `--role-id`, `--external`, `--lang` flags
+
+## New Features
+
+### Auth Impersonate
+- `--user` no longer requires client-side org resolution; the server auto-resolves the user's internal org via global UserDb lookup
+
+### Device Update
+- Add `--mobile-number` flag
+
+### DRC Create
+- Add `--group-ids` flag for permission group association
+
+### System User Update
+- Add `--role-id` flag
+
+### System Permission Update
+- Add `--description` flag
+
+### System Org Update
+- Add `--email`, `--country`, `--biz-category` flags
+
+## Bug Fixes
+
+- **Edge version upload**: `--app` parameter was silently ignored; now correctly passed as `?app=` query parameter
+- **Edge agent upload**: `--description` parameter was silently ignored; now correctly passed as `?description=` query parameter
+- **Device config set**: Fix API path from `/config/set2` to `/config/set` to match platform frontend
+- **Firmware create**: Fix API path from `/api/firmwares` to `/api/firmware` to match platform frontend
+
+---
+
 # v0.2.2 (2026-05-06)
 
 ## New Features

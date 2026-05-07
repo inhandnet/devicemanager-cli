@@ -177,6 +177,10 @@ func newCmdPermissionUpdate(f *factory.Factory) *cobra.Command {
 				v, _ := cmd.Flags().GetString("name")
 				body["name"] = v
 			}
+			if cmd.Flags().Changed("description") {
+				v, _ := cmd.Flags().GetString("description")
+				body["description"] = v
+			}
 
 			if len(body) == 0 {
 				return fmt.Errorf("at least one flag is required")
@@ -194,6 +198,7 @@ func newCmdPermissionUpdate(f *factory.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().String("name", "", "New group name")
+	cmd.Flags().String("description", "", "New group description")
 
 	return cmd
 }

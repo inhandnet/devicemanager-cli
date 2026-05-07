@@ -94,32 +94,69 @@ func newCmdAlertRuleGet(f *factory.Factory) *cobra.Command {
 
 func newCmdAlertRuleCreate(f *factory.Factory) *cobra.Command {
 	var (
-		name      string
-		metric    string
-		condition string
-		threshold string
-		duration  string
+		name           string
+		alertType      string
+		forDeviceType  string
+		forDeviceValue []string
+		notifyUsers    []string
+		notifyTypes    []string
+		notifyDelay    int
+		webhookURL     string
+		webhookSecret  string
+		locale         string
 	)
 
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create an alert rule",
-		Example: `  devicemanager device alert-rule create --name "offline-alert" \
-    --metric online --condition eq --threshold 0 --duration 300`,
+		Example: `  # Create an offline alert for all devices
+  devicemanager device alert-rule create --name "offline-alert" --alert-type offline
+
+  # Create an alert for specific devices with email notification
+  devicemanager device alert-rule create --name "offline-alert" --alert-type offline \
+    --for-device-type DEVICE --for-device-value id1,id2 \
+    --notify-users uid1,uid2 --notify-types email
+
+  # Create with webhook notification
+  devicemanager device alert-rule create --name "traffic-alert" \
+    --alert-type daily_traffic_excess \
+    --notify-types webhook --webhook-url https://example.com/hook`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
 				return err
 			}
 
+			forDevice := map[string]any{"type": forDeviceType}
+			if len(forDeviceValue) > 0 {
+				forDevice["value"] = forDeviceValue
+			}
+
+			notify := map[string]any{}
+			if len(notifyUsers) > 0 {
+				notify["users"] = notifyUsers
+			}
+			if len(notifyTypes) > 0 {
+				notify["types"] = notifyTypes
+			}
+			if notifyDelay > 0 {
+				notify["delay"] = notifyDelay
+			}
+
 			body := map[string]any{
 				"name":      name,
-				"metric":    metric,
-				"condition": condition,
-				"threshold": threshold,
+				"alertType": alertType,
+				"locale":    locale,
+				"forDevice": forDevice,
+				"notify":    notify,
 			}
-			if duration != "" {
-				body["duration"] = duration
+
+			if webhookURL != "" {
+				wh := map[string]any{"url": webhookURL}
+				if webhookSecret != "" {
+					wh["secret"] = webhookSecret
+				}
+				body["webhook"] = wh
 			}
 
 			output, _ := cmd.Flags().GetString("output")
@@ -134,19 +171,28 @@ func newCmdAlertRuleCreate(f *factory.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&name, "name", "", "Rule name (required)")
-	cmd.Flags().StringVar(&metric, "metric", "", "Metric to monitor (required)")
-	cmd.Flags().StringVar(&condition, "condition", "", "Condition operator (required)")
-	cmd.Flags().StringVar(&threshold, "threshold", "", "Threshold value (required)")
-	cmd.Flags().StringVar(&duration, "duration", "", "Duration in seconds")
+	cmd.Flags().StringVar(&alertType, "alert-type", "", "Alert type: online, offline, hourly_traffic_excess, daily_traffic_excess, monthly_traffic_excess, sim_switch, link_backup, link_change, power_switch, power_fault, power_recovery (required)")
+	cmd.Flags().StringVar(&forDeviceType, "for-device-type", "ALL", "Target scope: ALL, DEVICE_GROUP, or DEVICE")
+	cmd.Flags().StringSliceVar(&forDeviceValue, "for-device-value", nil, "Target device/group IDs (comma-separated)")
+	cmd.Flags().StringSliceVar(&notifyUsers, "notify-users", nil, "User IDs to notify (comma-separated)")
+	cmd.Flags().StringSliceVar(&notifyTypes, "notify-types", nil, "Notification types: email, sms, webhook (comma-separated)")
+	cmd.Flags().IntVar(&notifyDelay, "notify-delay", 0, "Delay in minutes before alerting (for online/offline)")
+	cmd.Flags().StringVar(&webhookURL, "webhook-url", "", "Webhook URL")
+	cmd.Flags().StringVar(&webhookSecret, "webhook-secret", "", "Webhook secret")
+	cmd.Flags().StringVar(&locale, "locale", "en", `Notification language: "en" or "zh"`)
 	_ = cmd.MarkFlagRequired("name")
-	_ = cmd.MarkFlagRequired("metric")
-	_ = cmd.MarkFlagRequired("condition")
-	_ = cmd.MarkFlagRequired("threshold")
+	_ = cmd.MarkFlagRequired("alert-type")
 
 	return cmd
 }
 
 func newCmdAlertRuleUpdate(f *factory.Factory) *cobra.Command {
+	var (
+		forDeviceValue []string
+		notifyUsers    []string
+		notifyTypes    []string
+	)
+
 	cmd := &cobra.Command{
 		Use:   "update <rule-id>",
 		Short: "Update an alert rule",
@@ -162,9 +208,40 @@ func newCmdAlertRuleUpdate(f *factory.Factory) *cobra.Command {
 				v, _ := cmd.Flags().GetString("name")
 				body["name"] = v
 			}
-			if cmd.Flags().Changed("threshold") {
-				v, _ := cmd.Flags().GetString("threshold")
-				body["threshold"] = v
+			if cmd.Flags().Changed("for-device-type") || cmd.Flags().Changed("for-device-value") {
+				forDevice := map[string]any{}
+				if cmd.Flags().Changed("for-device-type") {
+					v, _ := cmd.Flags().GetString("for-device-type")
+					forDevice["type"] = v
+				}
+				if len(forDeviceValue) > 0 {
+					forDevice["value"] = forDeviceValue
+				}
+				body["forDevice"] = forDevice
+			}
+			if cmd.Flags().Changed("notify-users") || cmd.Flags().Changed("notify-types") || cmd.Flags().Changed("notify-delay") {
+				notify := map[string]any{}
+				if len(notifyUsers) > 0 {
+					notify["users"] = notifyUsers
+				}
+				if len(notifyTypes) > 0 {
+					notify["types"] = notifyTypes
+				}
+				if cmd.Flags().Changed("notify-delay") {
+					v, _ := cmd.Flags().GetInt("notify-delay")
+					notify["delay"] = v
+				}
+				body["notify"] = notify
+			}
+			if cmd.Flags().Changed("webhook-url") {
+				wh := map[string]any{}
+				v, _ := cmd.Flags().GetString("webhook-url")
+				wh["url"] = v
+				if cmd.Flags().Changed("webhook-secret") {
+					s, _ := cmd.Flags().GetString("webhook-secret")
+					wh["secret"] = s
+				}
+				body["webhook"] = wh
 			}
 
 			if len(body) == 0 {
@@ -183,7 +260,13 @@ func newCmdAlertRuleUpdate(f *factory.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().String("name", "", "New rule name")
-	cmd.Flags().String("threshold", "", "New threshold value")
+	cmd.Flags().String("for-device-type", "", "Target scope: ALL, DEVICE_GROUP, or DEVICE")
+	cmd.Flags().StringSliceVar(&forDeviceValue, "for-device-value", nil, "Target device/group IDs (comma-separated)")
+	cmd.Flags().StringSliceVar(&notifyUsers, "notify-users", nil, "User IDs to notify (comma-separated)")
+	cmd.Flags().StringSliceVar(&notifyTypes, "notify-types", nil, "Notification types: email, sms, webhook (comma-separated)")
+	cmd.Flags().Int("notify-delay", 0, "Delay in minutes before alerting")
+	cmd.Flags().String("webhook-url", "", "Webhook URL")
+	cmd.Flags().String("webhook-secret", "", "Webhook secret")
 
 	return cmd
 }

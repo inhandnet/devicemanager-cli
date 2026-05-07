@@ -46,7 +46,7 @@ func NewCmdLogin(f *factory.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&opts.ContextName, "context", "default", "Context name to create/update")
-	cmd.Flags().StringVar(&opts.Host, "host", "cn", `Platform region: "cn", "global", or a custom domain`)
+	cmd.Flags().StringVar(&opts.Host, "host", "global", `Platform region: "global", "cn", or a custom domain`)
 	cmd.Flags().IntVar(&opts.Port, "port", defaultCallbackPort, "Local callback server port")
 	cmd.Flags().DurationVar(&opts.Timeout, "timeout", 3*time.Minute, "Timeout waiting for browser login")
 

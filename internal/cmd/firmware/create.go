@@ -46,7 +46,7 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Post("/api/firmwares", body)
+			resp, err := client.Post("/api/firmware", body)
 			if err != nil {
 				return err
 			}

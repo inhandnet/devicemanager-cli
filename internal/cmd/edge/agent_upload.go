@@ -32,12 +32,14 @@ func newCmdAgentUpload(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Upload("/api/edge/agents/upload", "file", filePath, file)
+			uploadURL := "/api/edge/agents/upload"
+			if desc != "" {
+				uploadURL = fmt.Sprintf("%s?description=%s", uploadURL, desc)
+			}
+			resp, err := client.Upload(uploadURL, "file", filePath, file)
 			if err != nil {
 				return err
 			}
-
-			_ = desc // description may be sent as additional field if API supports
 			fmt.Fprintf(f.IO.Out, "Agent uploaded\n")
 			return iostreams.FormatOutput(resp, f.IO, output)
 		},

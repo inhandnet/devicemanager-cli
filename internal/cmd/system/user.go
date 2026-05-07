@@ -91,15 +91,24 @@ func newCmdUserCreate(f *factory.Factory) *cobra.Command {
 	var (
 		name     string
 		email    string
-		password string
+		roleID   string
 		role     string
+		external bool
+		lang     string
 	)
 
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a user",
-		Example: `  devicemanager system user create --name "test" --email "test@example.com" \
-    --password "123456" --role "device_monitor"`,
+		Long:  "Create a user and send an invitation email. The user sets their password via the email link.",
+		Example: `  # Create an internal user (invitation email sent automatically)
+  devicemanager system user create --name "test" --email "test@example.com"
+
+  # Create with a specific role ID
+  devicemanager system user create --name "test" --email "test@example.com" --role-id <role-id>
+
+  # Create an external user
+  devicemanager system user create --email "ext@example.com" --external`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -107,12 +116,26 @@ func newCmdUserCreate(f *factory.Factory) *cobra.Command {
 			}
 
 			body := map[string]any{
-				"name":     name,
 				"email":    email,
-				"password": password,
+				"external": external,
+				"lang":     1, // English; overridden below for Chinese
+			}
+			if name != "" {
+				body["name"] = name
+			}
+			if roleID != "" {
+				body["roleId"] = roleID
 			}
 			if role != "" {
 				body["roleName"] = role
+			}
+			if lang != "" {
+				switch lang {
+				case "zh", "cn":
+					body["lang"] = 2
+				default:
+					body["lang"] = 1
+				}
 			}
 
 			output, _ := cmd.Flags().GetString("output")
@@ -126,13 +149,13 @@ func newCmdUserCreate(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&name, "name", "", "User name (required)")
+	cmd.Flags().StringVar(&name, "name", "", "User name")
 	cmd.Flags().StringVar(&email, "email", "", "User email (required)")
-	cmd.Flags().StringVar(&password, "password", "", "User password (required)")
+	cmd.Flags().StringVar(&roleID, "role-id", "", "Role ID")
 	cmd.Flags().StringVar(&role, "role", "", "Role name")
-	_ = cmd.MarkFlagRequired("name")
+	cmd.Flags().BoolVar(&external, "external", false, "Create as external user")
+	cmd.Flags().StringVar(&lang, "lang", "", `Invitation email language: "en" (default) or "zh"`)
 	_ = cmd.MarkFlagRequired("email")
-	_ = cmd.MarkFlagRequired("password")
 
 	return cmd
 }
@@ -152,6 +175,10 @@ func newCmdUserUpdate(f *factory.Factory) *cobra.Command {
 			if cmd.Flags().Changed("name") {
 				v, _ := cmd.Flags().GetString("name")
 				body["name"] = v
+			}
+			if cmd.Flags().Changed("role-id") {
+				v, _ := cmd.Flags().GetString("role-id")
+				body["roleId"] = v
 			}
 			if cmd.Flags().Changed("role") {
 				v, _ := cmd.Flags().GetString("role")
@@ -174,6 +201,7 @@ func newCmdUserUpdate(f *factory.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().String("name", "", "New user name")
+	cmd.Flags().String("role-id", "", "New role ID")
 	cmd.Flags().String("role", "", "New role name")
 
 	return cmd

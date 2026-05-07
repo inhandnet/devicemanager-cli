@@ -35,12 +35,11 @@ func newCmdVersionUpload(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Upload("/api/edge/apps/upload", "file", filePath, file)
+			uploadURL := fmt.Sprintf("/api/edge/apps/upload?app=%s", appID)
+			resp, err := client.Upload(uploadURL, "file", filePath, file)
 			if err != nil {
 				return err
 			}
-
-			_ = appID
 			fmt.Fprintf(f.IO.Out, "Version uploaded\n")
 			return iostreams.FormatOutput(resp, f.IO, output)
 		},

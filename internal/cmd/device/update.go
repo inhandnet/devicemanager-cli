@@ -34,9 +34,13 @@ func NewCmdUpdate(f *factory.Factory) *cobra.Command {
 				v, _ := cmd.Flags().GetString("description")
 				body["description"] = v
 			}
+			if cmd.Flags().Changed("mobile-number") {
+				v, _ := cmd.Flags().GetString("mobile-number")
+				body["mobileNumber"] = v
+			}
 
 			if len(body) == 0 {
-				return fmt.Errorf("at least one flag (--name, --description) is required")
+				return fmt.Errorf("at least one flag (--name, --description, --mobile-number) is required")
 			}
 
 			output, _ := cmd.Flags().GetString("output")
@@ -52,6 +56,7 @@ func NewCmdUpdate(f *factory.Factory) *cobra.Command {
 
 	cmd.Flags().String("name", "", "New device name")
 	cmd.Flags().String("description", "", "New device description")
+	cmd.Flags().String("mobile-number", "", "Device mobile number")
 
 	return cmd
 }

@@ -77,14 +77,8 @@ func NewCmdImpersonate(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			// Resolve missing uid or oid
-			if userID != "" && orgID == "" {
-				resolved, err := resolveOrgForUser(client, userID)
-				if err != nil {
-					return fmt.Errorf("resolving org for user: %w", err)
-				}
-				orgID = resolved
-			} else if orgID != "" && userID == "" {
+			// Resolve user for org (when only --org is given)
+			if orgID != "" && userID == "" {
 				resolved, err := resolveUserForOrg(client, orgID)
 				if err != nil {
 					return fmt.Errorf("resolving user for org: %w", err)
@@ -95,7 +89,9 @@ func NewCmdImpersonate(f *factory.Factory) *cobra.Command {
 			// Call impersonate API
 			token := ctx.EffectiveToken()
 			q := url.Values{}
-			q.Set("oid", orgID)
+			if orgID != "" {
+				q.Set("oid", orgID)
+			}
 			q.Set("uid", userID)
 			q.Set("access_token", token)
 			q.Set("verbose", "100")
@@ -130,7 +126,11 @@ func NewCmdImpersonate(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			fmt.Fprintf(f.IO.Out, "%s Impersonating user %s in org %s\n", iostreams.Green("✓"), userID, orgID)
+			if orgID != "" {
+				fmt.Fprintf(f.IO.Out, "%s Impersonating user %s in org %s\n", iostreams.Green("✓"), userID, orgID)
+			} else {
+				fmt.Fprintf(f.IO.Out, "%s Impersonating user %s\n", iostreams.Green("✓"), userID)
+			}
 			fmt.Fprintf(f.IO.Out, "Run 'devicemanager auth impersonate --stop' to restore admin identity\n")
 			return nil
 		},
@@ -141,42 +141,6 @@ func NewCmdImpersonate(f *factory.Factory) *cobra.Command {
 	cmd.Flags().BoolVar(&stop, "stop", false, "Stop impersonation and restore admin identity")
 
 	return cmd
-}
-
-// resolveOrgForUser finds the internal (non-external) org for a user.
-func resolveOrgForUser(client *api.APIClient, uid string) (string, error) {
-	body, err := client.Get(fmt.Sprintf("/api/users/%s/orgs", uid), nil)
-	if err != nil {
-		return "", err
-	}
-
-	results := gjson.GetBytes(body, "result")
-	if !results.Exists() {
-		return "", fmt.Errorf("no organizations found for user %s", uid)
-	}
-
-	for _, org := range results.Array() {
-		if !org.Get("external").Bool() {
-			oid := org.Get("oid").String()
-			if oid == "" {
-				oid = org.Get("_id").String()
-			}
-			if oid != "" {
-				return oid, nil
-			}
-		}
-	}
-
-	// Fallback: use the first org
-	first := results.Array()[0]
-	oid := first.Get("oid").String()
-	if oid == "" {
-		oid = first.Get("_id").String()
-	}
-	if oid == "" {
-		return "", fmt.Errorf("no org ID found for user %s", uid)
-	}
-	return oid, nil
 }
 
 // resolveUserForOrg finds the admin user for an org.

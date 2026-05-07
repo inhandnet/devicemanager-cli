@@ -27,8 +27,8 @@ CI automatically builds binaries for the following platforms:
 ### 1. Login
 
 ```bash
-devicemanager auth login                          # Login to China region (iot.inhand.com.cn)
-devicemanager auth login --host global            # Login to global region (iot.inhandnetworks.com)
+devicemanager auth login                          # Login to global region (iot.inhandnetworks.com)
+devicemanager auth login --host cn                # Login to China region (iot.inhand.com.cn)
 devicemanager auth login --host iot.example.com   # Custom domain
 devicemanager auth login --context prod           # Create/update a named context
 ```
@@ -106,6 +106,7 @@ devicemanager device clients batch <device-id>...                  # Batch query
 # Device update & delete
 devicemanager device update <device-id> --name "new-name"          # Rename device
 devicemanager device update <device-id> --description "office"     # Update description
+devicemanager device update <device-id> --mobile-number "1234567"  # Update mobile number
 devicemanager device delete <device-id>                            # Delete a device
 
 # Device alerts
@@ -119,9 +120,15 @@ devicemanager device alert-rule list --device-name router          # Filter by d
 devicemanager device alert-rule get <rule-id>                      # Rule details
 devicemanager device alert-rule create \
   --name "offline-alert" \
-  --metric online \
-  --condition eq \
-  --threshold 0                # Create an alert rule
+  --alert-type offline                                             # Create an alert rule
+devicemanager device alert-rule create \
+  --name "traffic-alert" \
+  --alert-type daily_traffic_excess \
+  --for-device-type DEVICE \
+  --for-device-value id1,id2 \
+  --notify-users uid1,uid2 \
+  --notify-types email,webhook \
+  --webhook-url https://example.com/hook                           # Create with notifications
 devicemanager device alert-rule update <rule-id> --name "new-name" # Update rule
 devicemanager device alert-rule enable <rule-id>                   # Enable rule
 devicemanager device alert-rule disable <rule-id>                  # Disable rule
@@ -276,10 +283,12 @@ devicemanager system user list                                     # List users 
 devicemanager system user get <user-id>                            # User details
 devicemanager system user create \
   --name "test" \
-  --email "test@example.com" \
-  --password "123456"          # Create a user
+  --email "test@example.com"               # Create a user (invitation email sent)
+devicemanager system user create \
+  --email "ext@example.com" --external     # Create an external user
 devicemanager system user update <user-id> --name "new-name"       # Update user
-devicemanager system user update <user-id> --role "device_monitor"  # Change role
+devicemanager system user update <user-id> --role-id <role-id>     # Change role by ID
+devicemanager system user update <user-id> --role "device_monitor"  # Change role by name
 devicemanager system user delete <user-id>                         # Delete user
 ```
 
@@ -289,7 +298,8 @@ devicemanager system user delete <user-id>                         # Delete user
 devicemanager system permission list                               # List permission groups
 devicemanager system permission get <group-id>                     # Group details
 devicemanager system permission create --name "office-devices"     # Create permission group
-devicemanager system permission update <group-id> --name "new"     # Update group
+devicemanager system permission update <group-id> --name "new"     # Update group name
+devicemanager system permission update <group-id> --description "desc"  # Update description
 devicemanager system permission delete <group-id>                  # Delete group
 devicemanager system permission users <group-id>                   # List users in group
 devicemanager system permission devices <group-id>                 # List devices in group
@@ -299,7 +309,9 @@ devicemanager system permission devices <group-id>                 # List device
 
 ```bash
 devicemanager system org get                                       # View current org info
-devicemanager system org update <org-id> --name "New Org Name"     # Update org info
+devicemanager system org update <org-id> --name "New Org Name"     # Update org name
+devicemanager system org update <org-id> --email "org@example.com" # Update org email
+devicemanager system org update <org-id> --country "US"            # Update country
 ```
 
 #### Audit logs
@@ -329,6 +341,19 @@ devicemanager firmware devices <firmware-id> add <device-id>...  # Add devices f
 devicemanager firmware devices <firmware-id> add --group <group-id>...  # Upgrade by group
 devicemanager firmware devices <firmware-id> remove <device-id>  # Cancel device upgrade
 ```
+
+### Device model documentation
+
+```bash
+devicemanager docs list                                         # List all available device models
+devicemanager docs list --model ER805                           # List documents for a specific model
+devicemanager docs get <path>                                   # Get a document by path
+devicemanager docs get --model ER805 <path>                     # Get a document under a specific model
+devicemanager docs search <keyword>                             # Search documents across all models
+devicemanager docs search --model ER805 <keyword>               # Search within a specific model
+```
+
+Documents are fetched from the [inhandnet/model-reference](https://github.com/inhandnet/model-reference) GitHub repository. Override the source with `DEVICEMANAGER_DOCS_REPO`.
 
 ### Debugging
 
@@ -426,7 +451,7 @@ internal/
   api/              # OAuth, token transport & auto-refresh, REST client, callback server
   build/            # Injected Version/Commit/Date
   cmd/              # Subcommand implementations
-    auth/           # Login, logout, auth status
+    auth/           # Login, logout, auth status, impersonate, switch-org, orgs
     config/         # Context management
     device/         # Device management
     devicegroup/    # Device group management
@@ -435,6 +460,7 @@ internal/
     edge/           # Edge computing (engine/app/version/config/control)
     firmware/       # Firmware management & upgrades
     task/           # Task management (unified DRC/firmware task view)
+    docs/           # Device model reference documentation (from GitHub)
     system/         # System management (users, permissions, org, audit logs)
     version/        # Version info
   cmdutil/          # Shared list flags (cursor/limit/verbose), query builder
