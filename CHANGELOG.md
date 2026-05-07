@@ -17,7 +17,10 @@
 ## New Features
 
 ### Auth Impersonate
-- `--user` no longer requires client-side org resolution; the server auto-resolves the user's internal org via global UserDb lookup
+- `--org` is now required; `--user` is optional and must be combined with `--org`
+- Automatically resolves org admin when only `--org` is given
+- Pre-checks token expiry before calling impersonate API
+- Improved error messages for API error responses
 
 ### Device Update
 - Add `--mobile-number` flag

@@ -1,6 +1,7 @@
 package docs
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -30,15 +31,19 @@ func rawURL(path string) string {
 	return fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s", repoBase(), defaultBranch, path)
 }
 
-func fetchRaw(url string) ([]byte, error) {
+func fetchRaw(rawURL string) ([]byte, error) {
 	client := &http.Client{Timeout: 30 * time.Second}
-	resp, err := client.Get(url)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, rawURL, http.NoBody)
 	if err != nil {
-		return nil, fmt.Errorf("fetching %s: %w", url, err)
+		return nil, fmt.Errorf("creating request for %s: %w", rawURL, err)
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("fetching %s: %w", rawURL, err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP %d fetching %s", resp.StatusCode, url)
+		return nil, fmt.Errorf("HTTP %d fetching %s", resp.StatusCode, rawURL)
 	}
 	return io.ReadAll(resp.Body)
 }

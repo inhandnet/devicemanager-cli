@@ -50,9 +50,9 @@ devicemanager device list
 devicemanager auth login                    # Browser-based OAuth login
 devicemanager auth status                   # View current auth status
 devicemanager auth logout                   # Log out
-devicemanager auth impersonate --user <uid> # Impersonate user (auto-resolves org)
-devicemanager auth impersonate --org <oid>  # Impersonate org admin
-devicemanager auth impersonate --stop       # Stop impersonation
+devicemanager auth impersonate --org <oid>             # Impersonate org admin
+devicemanager auth impersonate --org <oid> --user <uid> # Impersonate specific user
+devicemanager auth impersonate --stop                  # Stop impersonation
 devicemanager auth orgs                    # List your organizations
 devicemanager auth switch-org <org-id>     # Switch to another organization
 ```
