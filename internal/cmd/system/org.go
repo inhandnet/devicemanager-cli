@@ -104,8 +104,8 @@ func newCmdOrgUpdate(f *factory.Factory) *cobra.Command {
 				body["email"] = v
 			}
 			if cmd.Flags().Changed("country") {
-				v, _ := cmd.Flags().GetString("country")
-				body["country"] = v
+				code, _ := cmd.Flags().GetString("country")
+				body["country"] = map[string]string{"code": code, "name": code}
 			}
 			if cmd.Flags().Changed("biz-category") {
 				v, _ := cmd.Flags().GetString("biz-category")
@@ -131,7 +131,7 @@ func newCmdOrgUpdate(f *factory.Factory) *cobra.Command {
 	cmd.Flags().String("address", "", "Organization address")
 	cmd.Flags().String("contact", "", "Contact information")
 	cmd.Flags().String("email", "", "Organization email")
-	cmd.Flags().String("country", "", "Country")
+	cmd.Flags().String("country", "", "Country code (ISO 3166-1 alpha-2, e.g. CN, US, DE)")
 	cmd.Flags().String("biz-category", "", "Business category")
 
 	return cmd

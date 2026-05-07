@@ -315,9 +315,15 @@ devicemanager system permission create --name "office-devices"     # Create perm
 devicemanager system permission update <group-id> --name "new"     # Update group name
 devicemanager system permission update <group-id> --description "desc"  # Update description
 devicemanager system permission delete <group-id>                  # Delete group
-devicemanager system permission users <group-id>                   # List users in group
-devicemanager system permission devices <group-id>                 # List devices in group
-devicemanager system permission devicegroups <group-id>            # List device groups in permission group
+devicemanager system permission users list <group-id>              # List users in group
+devicemanager system permission users add <group-id> <uid>...      # Add users to group
+devicemanager system permission users remove <group-id> <uid>...   # Remove users from group
+devicemanager system permission devices list <group-id>            # List devices in group
+devicemanager system permission devices add <group-id> <did>...    # Add devices to group
+devicemanager system permission devices remove <group-id> <did>... # Remove devices from group
+devicemanager system permission devicegroups list <group-id>       # List device groups in group
+devicemanager system permission devicegroups add <group-id> <dgid>...    # Add device groups
+devicemanager system permission devicegroups remove <group-id> <dgid>... # Remove device groups
 devicemanager system permission unassigned-users                   # List users without a permission group
 ```
 
@@ -328,7 +334,7 @@ devicemanager system org list                                      # List organi
 devicemanager system org get                                       # View current org info
 devicemanager system org update <org-id> --name "New Org Name"     # Update org name
 devicemanager system org update <org-id> --email "org@example.com" # Update org email
-devicemanager system org update <org-id> --country "US"            # Update country
+devicemanager system org update <org-id> --country US              # Update country (ISO 3166-1 alpha-2)
 ```
 
 #### Audit logs

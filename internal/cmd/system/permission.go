@@ -206,12 +206,26 @@ func newCmdPermissionUpdate(f *factory.Factory) *cobra.Command {
 }
 
 func newCmdPermissionUsers(f *factory.Factory) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "users",
+		Short: "Manage users in a permission group",
+	}
+
+	cmd.AddCommand(newCmdPermissionUsersList(f))
+	cmd.AddCommand(newCmdPermissionUsersAdd(f))
+	cmd.AddCommand(newCmdPermissionUsersRemove(f))
+
+	return cmd
+}
+
+func newCmdPermissionUsersList(f *factory.Factory) *cobra.Command {
 	var flags cmdutil.ListFlags
 
 	cmd := &cobra.Command{
-		Use:   "users <group-id>",
-		Short: "List users in a permission group",
-		Args:  cobra.ExactArgs(1),
+		Use:     "list <group-id>",
+		Short:   "List users in a permission group",
+		Aliases: []string{"ls"},
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -239,13 +253,79 @@ func newCmdPermissionUsers(f *factory.Factory) *cobra.Command {
 	return cmd
 }
 
+func newCmdPermissionUsersAdd(f *factory.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:   "add <group-id> <user-id>...",
+		Short: "Add users to a permission group",
+		Args:  cobra.MinimumNArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := f.APIClient()
+			if err != nil {
+				return err
+			}
+
+			output, _ := cmd.Flags().GetString("output")
+
+			resp, err := client.Put(fmt.Sprintf("/api/groups/%s/users", args[0]), map[string]any{
+				"addUserIds": args[1:],
+			})
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintf(f.IO.Out, "Added %d user(s) to group %s\n", len(args[1:]), args[0])
+			return iostreams.FormatOutput(resp, f.IO, output)
+		},
+	}
+}
+
+func newCmdPermissionUsersRemove(f *factory.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:   "remove <group-id> <user-id>...",
+		Short: "Remove users from a permission group",
+		Args:  cobra.MinimumNArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := f.APIClient()
+			if err != nil {
+				return err
+			}
+
+			output, _ := cmd.Flags().GetString("output")
+
+			resp, err := client.Put(fmt.Sprintf("/api/groups/%s/users", args[0]), map[string]any{
+				"delUserIds": args[1:],
+			})
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintf(f.IO.Out, "Removed %d user(s) from group %s\n", len(args[1:]), args[0])
+			return iostreams.FormatOutput(resp, f.IO, output)
+		},
+	}
+}
+
 func newCmdPermissionDevices(f *factory.Factory) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "devices",
+		Short: "Manage devices in a permission group",
+	}
+
+	cmd.AddCommand(newCmdPermissionDevicesList(f))
+	cmd.AddCommand(newCmdPermissionDevicesAdd(f))
+	cmd.AddCommand(newCmdPermissionDevicesRemove(f))
+
+	return cmd
+}
+
+func newCmdPermissionDevicesList(f *factory.Factory) *cobra.Command {
 	var flags cmdutil.ListFlags
 
 	cmd := &cobra.Command{
-		Use:   "devices <group-id>",
-		Short: "List devices in a permission group",
-		Args:  cobra.ExactArgs(1),
+		Use:     "list <group-id>",
+		Short:   "List devices in a permission group",
+		Aliases: []string{"ls"},
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -273,13 +353,79 @@ func newCmdPermissionDevices(f *factory.Factory) *cobra.Command {
 	return cmd
 }
 
+func newCmdPermissionDevicesAdd(f *factory.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:   "add <group-id> <device-id>...",
+		Short: "Add devices to a permission group",
+		Args:  cobra.MinimumNArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := f.APIClient()
+			if err != nil {
+				return err
+			}
+
+			output, _ := cmd.Flags().GetString("output")
+
+			resp, err := client.Put(fmt.Sprintf("/api/groups/%s/devices", args[0]), map[string]any{
+				"addDeviceIds": args[1:],
+			})
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintf(f.IO.Out, "Added %d device(s) to group %s\n", len(args[1:]), args[0])
+			return iostreams.FormatOutput(resp, f.IO, output)
+		},
+	}
+}
+
+func newCmdPermissionDevicesRemove(f *factory.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:   "remove <group-id> <device-id>...",
+		Short: "Remove devices from a permission group",
+		Args:  cobra.MinimumNArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := f.APIClient()
+			if err != nil {
+				return err
+			}
+
+			output, _ := cmd.Flags().GetString("output")
+
+			resp, err := client.Put(fmt.Sprintf("/api/groups/%s/devices", args[0]), map[string]any{
+				"delDeviceIds": args[1:],
+			})
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintf(f.IO.Out, "Removed %d device(s) from group %s\n", len(args[1:]), args[0])
+			return iostreams.FormatOutput(resp, f.IO, output)
+		},
+	}
+}
+
 func newCmdPermissionDeviceGroups(f *factory.Factory) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "devicegroups",
+		Short: "Manage device groups in a permission group",
+	}
+
+	cmd.AddCommand(newCmdPermissionDeviceGroupsList(f))
+	cmd.AddCommand(newCmdPermissionDeviceGroupsAdd(f))
+	cmd.AddCommand(newCmdPermissionDeviceGroupsRemove(f))
+
+	return cmd
+}
+
+func newCmdPermissionDeviceGroupsList(f *factory.Factory) *cobra.Command {
 	var flags cmdutil.ListFlags
 
 	cmd := &cobra.Command{
-		Use:   "devicegroups <group-id>",
-		Short: "List device groups in a permission group",
-		Args:  cobra.ExactArgs(1),
+		Use:     "list <group-id>",
+		Short:   "List device groups in a permission group",
+		Aliases: []string{"ls"},
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -304,6 +450,58 @@ func newCmdPermissionDeviceGroups(f *factory.Factory) *cobra.Command {
 	flags.Register(cmd)
 
 	return cmd
+}
+
+func newCmdPermissionDeviceGroupsAdd(f *factory.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:   "add <group-id> <devicegroup-id>...",
+		Short: "Add device groups to a permission group",
+		Args:  cobra.MinimumNArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := f.APIClient()
+			if err != nil {
+				return err
+			}
+
+			output, _ := cmd.Flags().GetString("output")
+
+			resp, err := client.Put(fmt.Sprintf("/api/groups/%s/devicegroups", args[0]), map[string]any{
+				"addDeviceGroupIds": args[1:],
+			})
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintf(f.IO.Out, "Added %d device group(s) to group %s\n", len(args[1:]), args[0])
+			return iostreams.FormatOutput(resp, f.IO, output)
+		},
+	}
+}
+
+func newCmdPermissionDeviceGroupsRemove(f *factory.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:   "remove <group-id> <devicegroup-id>...",
+		Short: "Remove device groups from a permission group",
+		Args:  cobra.MinimumNArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := f.APIClient()
+			if err != nil {
+				return err
+			}
+
+			output, _ := cmd.Flags().GetString("output")
+
+			resp, err := client.Put(fmt.Sprintf("/api/groups/%s/devicegroups", args[0]), map[string]any{
+				"delDeviceGroupIds": args[1:],
+			})
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintf(f.IO.Out, "Removed %d device group(s) from group %s\n", len(args[1:]), args[0])
+			return iostreams.FormatOutput(resp, f.IO, output)
+		},
+	}
 }
 
 func newCmdPermissionUnassignedUsers(f *factory.Factory) *cobra.Command {

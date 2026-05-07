@@ -1,3 +1,23 @@
+# v0.5.0 (2026-05-07)
+
+## New Features
+
+### Permission Group Member Management
+- Restructure `permission users/devices/devicegroups` as subcommand groups with `list/add/remove`
+- Add `system permission users add/remove` to manage users in a permission group
+- Add `system permission devices add/remove` to manage devices in a permission group
+- Add `system permission devicegroups list/add/remove` to manage device groups in a permission group
+
+### Improvements
+- `system org update --country` now accepts ISO 3166-1 alpha-2 code (e.g. CN, US) and sends `{code, name}` object matching platform frontend format
+- Remove `--role` flag from user create/update (only `--role-id`)
+
+## Bug Fixes
+
+- **API command in Git Bash**: Fix MSYS path conversion issue where `/api/xxx` was converted to `E:/Git/api/xxx` on Windows Git Bash
+
+---
+
 # v0.4.0 (2026-05-07)
 
 ## New Features
@@ -12,7 +32,6 @@
 - Add `firmware job-stats` for upgrade job statistics
 - Add `system role list` to list roles in organization
 - Add `system org list` to list organizations
-- Add `system permission devicegroups` to list device groups in a permission group
 - Add `system permission unassigned-users` to list users without a permission group
 
 ---

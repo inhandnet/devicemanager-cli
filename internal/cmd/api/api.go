@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -59,7 +60,7 @@ Authorization header is automatically injected.`,
   devicemanager api /api/devices/DEVICE_ID/files/capture_result.pcap --output-file capture.pcap`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			opts.Path = args[0]
+			opts.Path = fixMSYSPath(args[0])
 			if opts.Method == "" {
 				opts.Method = "GET"
 			}
@@ -168,4 +169,24 @@ func buildRequestOptions(opts *ApiOptions) (*inapi.RequestOptions, error) {
 	}
 
 	return reqOpts, nil
+}
+
+// fixMSYSPath detects and reverts MSYS/Git Bash automatic path conversion.
+// In Git Bash on Windows, arguments starting with "/" are converted to Windows
+// paths (e.g. "/api/devices" becomes "E:/Git/api/devices"). This function
+// detects the pattern and restores the original API path.
+var msysPathRe = regexp.MustCompile(`^[A-Za-z]:[/\\]`)
+
+func fixMSYSPath(path string) string {
+	if !msysPathRe.MatchString(path) {
+		return path
+	}
+	// MSYS/Git Bash converts "/api/xxx" to "E:/Git/api/xxx".
+	// Find the known API path prefixes and extract from there.
+	for _, prefix := range []string{"/api", "/oauth2"} {
+		if idx := strings.Index(strings.ToLower(path), prefix); idx >= 0 {
+			return path[idx:]
+		}
+	}
+	return path
 }
