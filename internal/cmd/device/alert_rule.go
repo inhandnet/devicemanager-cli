@@ -3,6 +3,9 @@ package device
 import (
 	"fmt"
 	"net/url"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -11,6 +14,23 @@ import (
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 	"github.com/inhandnet/devicemanager-cli/internal/ui"
 )
+
+// parseTimeToSecOfDay parses "HH:MM" to seconds of day.
+func parseTimeToSecOfDay(s string) (int, error) {
+	parts := strings.SplitN(s, ":", 2)
+	if len(parts) != 2 {
+		return 0, fmt.Errorf("expected HH:MM format, got %q", s)
+	}
+	h, err := strconv.Atoi(parts[0])
+	if err != nil || h < 0 || h > 23 {
+		return 0, fmt.Errorf("invalid hour: %s", parts[0])
+	}
+	m, err := strconv.Atoi(parts[1])
+	if err != nil || m < 0 || m > 59 {
+		return 0, fmt.Errorf("invalid minute: %s", parts[1])
+	}
+	return h*3600 + m*60, nil
+}
 
 func NewCmdAlertRule(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
@@ -104,6 +124,8 @@ func newCmdAlertRuleCreate(f *factory.Factory) *cobra.Command {
 		webhookURL     string
 		webhookSecret  string
 		locale         string
+		alertTimeStart string
+		alertTimeEnd   string
 	)
 
 	cmd := &cobra.Command{
@@ -159,6 +181,26 @@ func newCmdAlertRuleCreate(f *factory.Factory) *cobra.Command {
 				body["webhook"] = wh
 			}
 
+			if alertTimeStart != "" || alertTimeEnd != "" {
+				body["customAlertTime"] = true
+				_, offset := time.Now().Zone()
+				body["offsetTotalSec"] = offset
+				if alertTimeStart != "" {
+					sec, err := parseTimeToSecOfDay(alertTimeStart)
+					if err != nil {
+						return fmt.Errorf("invalid --alert-time-start: %w", err)
+					}
+					body["alertTimeRangeStartSecOfDay"] = sec
+				}
+				if alertTimeEnd != "" {
+					sec, err := parseTimeToSecOfDay(alertTimeEnd)
+					if err != nil {
+						return fmt.Errorf("invalid --alert-time-end: %w", err)
+					}
+					body["alertTimeRangeEndSecOfDay"] = sec
+				}
+			}
+
 			output, _ := cmd.Flags().GetString("output")
 
 			resp, err := client.Post("/api/alert-rules", body)
@@ -176,10 +218,12 @@ func newCmdAlertRuleCreate(f *factory.Factory) *cobra.Command {
 	cmd.Flags().StringSliceVar(&forDeviceValue, "for-device-value", nil, "Target device/group IDs (comma-separated)")
 	cmd.Flags().StringSliceVar(&notifyUsers, "notify-users", nil, "User IDs to notify (comma-separated)")
 	cmd.Flags().StringSliceVar(&notifyTypes, "notify-types", nil, "Notification types: email, sms, webhook (comma-separated)")
-	cmd.Flags().IntVar(&notifyDelay, "notify-delay", 0, "Delay in minutes before alerting (for online/offline)")
-	cmd.Flags().StringVar(&webhookURL, "webhook-url", "", "Webhook URL")
-	cmd.Flags().StringVar(&webhookSecret, "webhook-secret", "", "Webhook secret")
+	cmd.Flags().IntVar(&notifyDelay, "notify-delay", 0, "Delay in minutes before alerting, 0 = immediate (for online/offline types)")
+	cmd.Flags().StringVar(&webhookURL, "webhook-url", "", "Webhook callback URL (required when notify-types includes webhook)")
+	cmd.Flags().StringVar(&webhookSecret, "webhook-secret", "", "Webhook HMAC signing secret")
 	cmd.Flags().StringVar(&locale, "locale", "en", `Notification language: "en" or "zh"`)
+	cmd.Flags().StringVar(&alertTimeStart, "alert-time-start", "", "Alert time range start (HH:MM, e.g. 08:00)")
+	cmd.Flags().StringVar(&alertTimeEnd, "alert-time-end", "", "Alert time range end (HH:MM, e.g. 18:00)")
 	_ = cmd.MarkFlagRequired("name")
 	_ = cmd.MarkFlagRequired("alert-type")
 
@@ -243,6 +287,27 @@ func newCmdAlertRuleUpdate(f *factory.Factory) *cobra.Command {
 				}
 				body["webhook"] = wh
 			}
+			if cmd.Flags().Changed("alert-time-start") || cmd.Flags().Changed("alert-time-end") {
+				body["customAlertTime"] = true
+				_, offset := time.Now().Zone()
+				body["offsetTotalSec"] = offset
+				if cmd.Flags().Changed("alert-time-start") {
+					v, _ := cmd.Flags().GetString("alert-time-start")
+					sec, err := parseTimeToSecOfDay(v)
+					if err != nil {
+						return fmt.Errorf("invalid --alert-time-start: %w", err)
+					}
+					body["alertTimeRangeStartSecOfDay"] = sec
+				}
+				if cmd.Flags().Changed("alert-time-end") {
+					v, _ := cmd.Flags().GetString("alert-time-end")
+					sec, err := parseTimeToSecOfDay(v)
+					if err != nil {
+						return fmt.Errorf("invalid --alert-time-end: %w", err)
+					}
+					body["alertTimeRangeEndSecOfDay"] = sec
+				}
+			}
 
 			if len(body) == 0 {
 				return fmt.Errorf("at least one flag is required")
@@ -267,6 +332,8 @@ func newCmdAlertRuleUpdate(f *factory.Factory) *cobra.Command {
 	cmd.Flags().Int("notify-delay", 0, "Delay in minutes before alerting")
 	cmd.Flags().String("webhook-url", "", "Webhook URL")
 	cmd.Flags().String("webhook-secret", "", "Webhook secret")
+	cmd.Flags().String("alert-time-start", "", "Alert time range start (HH:MM, e.g. 08:00)")
+	cmd.Flags().String("alert-time-end", "", "Alert time range end (HH:MM, e.g. 18:00)")
 
 	return cmd
 }

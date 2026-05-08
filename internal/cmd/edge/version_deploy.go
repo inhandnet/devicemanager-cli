@@ -45,8 +45,8 @@ func newCmdVersionDeploy(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringSlice("device", nil, "Device IDs to deploy")
-	cmd.Flags().StringSlice("group", nil, "Device group IDs to deploy")
+	cmd.Flags().StringSlice("device", nil, "Device IDs to deploy (comma-separated or repeated)")
+	cmd.Flags().StringSlice("group", nil, "Device group IDs to deploy (comma-separated or repeated)")
 
 	return cmd
 }

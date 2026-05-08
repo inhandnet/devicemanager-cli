@@ -3,3 +3,4 @@ bin/
 .claude/
 .worktrees/
 CLAUDE.local.md
+docs/

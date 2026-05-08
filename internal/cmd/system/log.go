@@ -92,7 +92,7 @@ func newCmdLogList(f *factory.Factory) *cobra.Command {
 	opts.Register(cmd)
 	cmd.Flags().StringVar(&opts.StartTime, "start-time", "", "Start date (YYYY-MM-DD)")
 	cmd.Flags().StringVar(&opts.EndTime, "end-time", "", "End date (YYYY-MM-DD)")
-	cmd.Flags().StringVar(&opts.Level, "level", "", "Filter by level")
+	cmd.Flags().StringVar(&opts.Level, "level", "", "Filter by level (info, warning, error)")
 
 	return cmd
 }

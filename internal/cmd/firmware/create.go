@@ -56,12 +56,12 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&opts.FID, "fid", "", "Uploaded file ID (required)")
-	cmd.Flags().StringVar(&opts.Name, "name", "", "Firmware name (required)")
-	cmd.Flags().StringVar(&opts.Version, "version", "", "Firmware version (required)")
-	cmd.Flags().StringVar(&opts.Model, "model", "", "Device model (required)")
+	cmd.Flags().StringVar(&opts.FID, "fid", "", "File ID returned by 'firmware upload' (required)")
+	cmd.Flags().StringVar(&opts.Name, "name", "", "Firmware display name (required)")
+	cmd.Flags().StringVar(&opts.Version, "version", "", "Firmware version, e.g. 2.0.0 (required)")
+	cmd.Flags().StringVar(&opts.Model, "model", "", "Target device model, e.g. IR615 (required)")
 	cmd.Flags().StringVar(&opts.Desc, "desc", "", "Description")
-	cmd.Flags().IntVar(&opts.JobTimeout, "job-timeout", 0, "Job timeout (seconds)")
+	cmd.Flags().IntVar(&opts.JobTimeout, "job-timeout", 0, "Per-device upgrade timeout in seconds (0 = platform default)")
 	_ = cmd.MarkFlagRequired("fid")
 	_ = cmd.MarkFlagRequired("name")
 	_ = cmd.MarkFlagRequired("version")

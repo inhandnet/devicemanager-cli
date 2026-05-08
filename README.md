@@ -91,7 +91,8 @@ devicemanager device get <device-id> --verbose 100                 # Device deta
 devicemanager device create --name <name> --serial-number <sn>     # Add a device
 devicemanager device models                                        # List supported device models
 devicemanager device stats                                         # Device overview (online/total counts)
-devicemanager device signal <device-id> --after <ISO> --before <ISO>  # Signal quality history
+devicemanager device signal <device-id> --after <ISO>                 # Signal quality (from start to now)
+devicemanager device signal <device-id> --after <ISO> --before <ISO>  # Signal quality (time range)
 devicemanager device kick <device-id>                              # Force disconnect
 devicemanager device reboot <device-id> --timeout 15000            # Reboot (milliseconds)
 
@@ -100,12 +101,12 @@ devicemanager device traffic monthly 202604 <device-id>            # Monthly tra
 devicemanager device traffic daily 202604 <device-id>              # Daily traffic
 devicemanager device traffic hourly <device-id>                    # Hourly traffic (last 24h)
 devicemanager device traffic hourly <device-id> --after 2026-04-25 --before 2026-04-27  # Custom range (max 6 days)
-devicemanager device traffic top --month 202604                    # Top devices by monthly traffic
-devicemanager device traffic top --month 202604 --limit 10         # Top 10
+devicemanager device traffic top --date 202604                     # Top devices by monthly traffic
+devicemanager device traffic top --date 202604 --limit 10          # Top 10
 
 # Device count trends
-devicemanager device count online --after 2026-04-01 --before 2026-04-30  # Online count over time
-devicemanager device count total --after 2026-04-01 --before 2026-04-30   # Total count over time
+devicemanager device count online --start-time 1714492800 --end-time 1717084800  # Online count over time
+devicemanager device count total --start-time 1714492800 --end-time 1717084800   # Total count over time
 
 # Device clients
 devicemanager device clients list <device-id>                      # List connected clients

@@ -2,6 +2,7 @@ package device
 
 import (
 	"net/url"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -16,12 +17,19 @@ func NewCmdSignal(f *factory.Factory) *cobra.Command {
 		Use:   "signal <device-id>",
 		Short: "Query historical signal quality",
 		Args:  cobra.ExactArgs(1),
-		Example: `  devicemanager device signal 5e6f222afbcf3e0001e133f4 \
-    --after 2024-01-01T00:00:00Z --before 2024-01-02T00:00:00Z`,
+		Example: `  # Query signal from a start time to now
+  devicemanager device signal <device-id> --after 2026-05-01T00:00:00Z
+
+  # Query signal for a specific time range
+  devicemanager device signal <device-id> --after 2026-05-01T00:00:00Z --before 2026-05-02T00:00:00Z`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
 				return err
+			}
+
+			if before == "" {
+				before = time.Now().UTC().Format(time.RFC3339)
 			}
 
 			q := url.Values{}
@@ -39,10 +47,9 @@ func NewCmdSignal(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&after, "after", "", "Start time (ISO 8601, e.g. 2024-01-01T00:00:00Z) (required)")
-	cmd.Flags().StringVar(&before, "before", "", "End time (ISO 8601, e.g. 2024-01-02T00:00:00Z) (required)")
+	cmd.Flags().StringVar(&after, "after", "", "Start time (ISO 8601, e.g. 2026-05-01T00:00:00Z) (required)")
+	cmd.Flags().StringVar(&before, "before", "", "End time (ISO 8601, defaults to now)")
 	_ = cmd.MarkFlagRequired("after")
-	_ = cmd.MarkFlagRequired("before")
 
 	return cmd
 }

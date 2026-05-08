@@ -16,7 +16,10 @@ func NewCmdDelete(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete <device-id>",
 		Short: "Delete a device",
-		Args:  cobra.ExactArgs(1),
+		Long:  "Permanently remove a device from the platform. This action cannot be undone.",
+		Example: `  devicemanager device delete 5d6349d6335c8c000178a194
+  devicemanager device delete 5d6349d6335c8c000178a194 -y  # Skip confirmation`,
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !ui.Confirm(f.IO, fmt.Sprintf("Delete device %s?", args[0]), yes) {
 				return nil

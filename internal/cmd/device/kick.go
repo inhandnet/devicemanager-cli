@@ -17,7 +17,9 @@ func NewCmdKick(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "kick <device-id>",
 		Short: "Force disconnect a device",
-		Args:  cobra.ExactArgs(1),
+		Long:  "Force disconnect a device from the platform. The device will attempt to reconnect automatically.",
+		Example: `  devicemanager device kick 5d6349d6335c8c000178a194`,
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !ui.Confirm(f.IO, fmt.Sprintf("Kick device %s?", args[0]), yes) {
 				return nil
@@ -51,8 +53,11 @@ func NewCmdReboot(f *factory.Factory) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "reboot <device-id>",
-		Short: "Reboot a device",
-		Args:  cobra.ExactArgs(1),
+		Short: "Reboot a device remotely",
+		Long:  "Send a reboot command to a device. The device must be online. It will go offline briefly and reconnect.",
+		Example: `  devicemanager device reboot 5d6349d6335c8c000178a194
+  devicemanager device reboot 5d6349d6335c8c000178a194 --timeout 30000  # 30 second timeout`,
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !ui.Confirm(f.IO, fmt.Sprintf("Reboot device %s?", args[0]), yes) {
 				return nil
@@ -79,7 +84,7 @@ func NewCmdReboot(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().IntVar(&timeout, "timeout", 15000, "Timeout in milliseconds")
+	cmd.Flags().IntVar(&timeout, "timeout", 15000, "Timeout in milliseconds (default 15000ms = 15s)")
 	cmd.Flags().BoolVarP(&yes, "yes", "y", false, "Skip confirmation prompt")
 
 	return cmd

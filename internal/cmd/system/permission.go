@@ -255,9 +255,10 @@ func newCmdPermissionUsersList(f *factory.Factory) *cobra.Command {
 
 func newCmdPermissionUsersAdd(f *factory.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:   "add <group-id> <user-id>...",
-		Short: "Add users to a permission group",
-		Args:  cobra.MinimumNArgs(2),
+		Use:     "add <group-id> <user-id>...",
+		Short:   "Add users to a permission group",
+		Example: `  devicemanager system permission users add <group-id> <user-id1> <user-id2>`,
+		Args:    cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -281,9 +282,10 @@ func newCmdPermissionUsersAdd(f *factory.Factory) *cobra.Command {
 
 func newCmdPermissionUsersRemove(f *factory.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:   "remove <group-id> <user-id>...",
-		Short: "Remove users from a permission group",
-		Args:  cobra.MinimumNArgs(2),
+		Use:     "remove <group-id> <user-id>...",
+		Short:   "Remove users from a permission group",
+		Example: `  devicemanager system permission users remove <group-id> <user-id1> <user-id2>`,
+		Args:    cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -355,9 +357,10 @@ func newCmdPermissionDevicesList(f *factory.Factory) *cobra.Command {
 
 func newCmdPermissionDevicesAdd(f *factory.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:   "add <group-id> <device-id>...",
-		Short: "Add devices to a permission group",
-		Args:  cobra.MinimumNArgs(2),
+		Use:     "add <group-id> <device-id>...",
+		Short:   "Add devices to a permission group",
+		Example: `  devicemanager system permission devices add <group-id> <device-id1> <device-id2>`,
+		Args:    cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -381,9 +384,10 @@ func newCmdPermissionDevicesAdd(f *factory.Factory) *cobra.Command {
 
 func newCmdPermissionDevicesRemove(f *factory.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:   "remove <group-id> <device-id>...",
-		Short: "Remove devices from a permission group",
-		Args:  cobra.MinimumNArgs(2),
+		Use:     "remove <group-id> <device-id>...",
+		Short:   "Remove devices from a permission group",
+		Example: `  devicemanager system permission devices remove <group-id> <device-id1> <device-id2>`,
+		Args:    cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -454,9 +458,10 @@ func newCmdPermissionDeviceGroupsList(f *factory.Factory) *cobra.Command {
 
 func newCmdPermissionDeviceGroupsAdd(f *factory.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:   "add <group-id> <devicegroup-id>...",
-		Short: "Add device groups to a permission group",
-		Args:  cobra.MinimumNArgs(2),
+		Use:     "add <group-id> <devicegroup-id>...",
+		Short:   "Add device groups to a permission group",
+		Example: `  devicemanager system permission devicegroups add <group-id> <devicegroup-id1>`,
+		Args:    cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -480,9 +485,10 @@ func newCmdPermissionDeviceGroupsAdd(f *factory.Factory) *cobra.Command {
 
 func newCmdPermissionDeviceGroupsRemove(f *factory.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:   "remove <group-id> <devicegroup-id>...",
-		Short: "Remove device groups from a permission group",
-		Args:  cobra.MinimumNArgs(2),
+		Use:     "remove <group-id> <devicegroup-id>...",
+		Short:   "Remove device groups from a permission group",
+		Example: `  devicemanager system permission devicegroups remove <group-id> <devicegroup-id1>`,
+		Args:    cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {

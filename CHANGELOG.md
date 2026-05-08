@@ -5,6 +5,17 @@
 - **devicegroup list**: Remove invalid `--cursor`/`--limit` flags (API returns full tree, not paginated); add `--max-depth` flag
 - **tunnel list**: Remove invalid `--cursor`/`--limit` flags (API does not support pagination)
 - **system log list**: Default to last 7 days when `--start-time` is not specified (previously returned API error)
+- **device count online/total**: Fix parameter names from `--after`/`--before` to `--start-time`/`--end-time` to match API
+- **device traffic top**: Fix parameter name from `--month` to `--date` to match API
+- **device signal**: Make `--before` optional (defaults to now)
+- **firmware upload**: Fix missing `filename` form field (caused "Miss required parameter" error)
+
+## Improvements
+
+### Help Documentation
+- Add Long descriptions and Examples to destructive commands (device delete/kick/reboot, permission add/remove)
+- Add Long description and Example to `firmware upload` explaining the fid workflow
+- Improve flag help text with format examples, enum values, and default value explanations across device, firmware, system, tunnel, edge, and alert-rule commands
 
 ---
 

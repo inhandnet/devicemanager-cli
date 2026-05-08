@@ -104,13 +104,13 @@ Run `devicemanager version` to confirm the installation succeeded.
 devicemanager auth login
 ```
 
-This opens a browser for OAuth authorization. It defaults to the China region and creates a `default` context automatically.
+This opens a browser for OAuth authorization. It defaults to the Global region and creates a `default` context automatically.
 
 Two production regions are available:
 
 | Region | Short name | Domain                 | Command                                  |
 |--------|-----------|------------------------|------------------------------------------|
-| China  | `cn`      | iot.inhand.com.cn      | `devicemanager auth login` (default)     |
-| Global | `global`  | iot.inhandnetworks.com | `devicemanager auth login --host global` |
+| Global | `global`  | iot.inhandnetworks.com | `devicemanager auth login` (default)     |
+| China  | `cn`      | iot.inhand.com.cn      | `devicemanager auth login --host cn`     |
 
 Ask the user which region they need. After login, verify with `devicemanager auth status`.

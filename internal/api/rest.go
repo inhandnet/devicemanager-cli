@@ -65,6 +65,11 @@ func (c *APIClient) Upload(path, fieldName, fileName string, reader io.Reader) (
 	return c.execute(r, resty.MethodPost, path)
 }
 
+func (c *APIClient) UploadWithFields(path, fieldName, fileName string, reader io.Reader, fields map[string]string) ([]byte, error) {
+	r := c.inner.R().SetFileReader(fieldName, fileName, reader).SetFormData(fields)
+	return c.execute(r, resty.MethodPost, path)
+}
+
 type RequestOptions struct {
 	Query       url.Values
 	Body        interface{}

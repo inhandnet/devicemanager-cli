@@ -11,15 +11,15 @@ import (
 
 func NewCmdTrafficTop(f *factory.Factory) *cobra.Command {
 	var (
-		month string
+		date string
 		limit string
 	)
 
 	cmd := &cobra.Command{
 		Use:   "top",
 		Short: "Show top devices by monthly traffic",
-		Example: `  devicemanager device traffic top --month 202604
-  devicemanager device traffic top --month 202604 --limit 10`,
+		Example: `  devicemanager device traffic top --date 202604
+  devicemanager device traffic top --date 202604 --limit 10`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -27,8 +27,8 @@ func NewCmdTrafficTop(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			if month != "" {
-				q.Set("month", month)
+			if date != "" {
+				q.Set("date", date)
 			}
 			if limit != "" {
 				q.Set("limit", limit)
@@ -45,7 +45,7 @@ func NewCmdTrafficTop(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&month, "month", "", "Month in YYYYMM format (e.g. 202604)")
+	cmd.Flags().StringVar(&date, "date", "", "Month in YYYYMM format (e.g. 202604)")
 	cmd.Flags().StringVar(&limit, "limit", "", "Number of top devices to return")
 
 	return cmd

@@ -52,7 +52,7 @@ func NewCmdDevicesList(f *factory.Factory) *cobra.Command {
 	opts.Register(cmd)
 	cmd.Flags().StringVar(&opts.Name, "name", "", "Filter by device name")
 	cmd.Flags().StringVar(&opts.SerialNumber, "serial-number", "", "Filter by serial number")
-	cmd.Flags().StringVar(&opts.Status, "status", "", "Filter by status")
+	cmd.Flags().StringVar(&opts.Status, "status", "", "Filter by status (pending, running, success, failed)")
 
 	return cmd
 }
