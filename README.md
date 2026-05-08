@@ -340,7 +340,7 @@ devicemanager system org update <org-id> --country US              # Update coun
 #### Audit logs
 
 ```bash
-devicemanager system log list                                      # List recent audit logs
+devicemanager system log list                                      # List audit logs (defaults to last 7 days)
 devicemanager system log list --start-time 2026-04-24 --end-time 2026-04-30  # Filter by date
 devicemanager system log list --level warning                      # Filter by level
 ```

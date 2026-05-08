@@ -2,6 +2,7 @@ package tunnel
 
 import (
 	"net/url"
+	"strconv"
 
 	"github.com/spf13/cobra"
 
@@ -10,14 +11,12 @@ import (
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
-type ListOptions struct {
-	cmdutil.ListFlags
-	Name     string
-	DeviceID string
-}
-
 func NewCmdList(f *factory.Factory) *cobra.Command {
-	opts := &ListOptions{}
+	var (
+		name     string
+		deviceID string
+		verbose  int
+	)
 
 	cmd := &cobra.Command{
 		Use:     "list",
@@ -30,9 +29,11 @@ func NewCmdList(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			opts.ApplyTo(q)
-			cmdutil.SetQueryParam(q, "name", opts.Name)
-			cmdutil.SetQueryParam(q, "device_id", opts.DeviceID)
+			if verbose > 0 {
+				q.Set("verbose", strconv.Itoa(verbose))
+			}
+			cmdutil.SetQueryParam(q, "name", name)
+			cmdutil.SetQueryParam(q, "device_id", deviceID)
 
 			output, _ := cmd.Flags().GetString("output")
 
@@ -46,9 +47,9 @@ func NewCmdList(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	opts.Register(cmd)
-	cmd.Flags().StringVar(&opts.Name, "name", "", "Filter by tunnel name")
-	cmd.Flags().StringVar(&opts.DeviceID, "device-id", "", "Filter by device ID")
+	cmd.Flags().StringVar(&name, "name", "", "Filter by tunnel name")
+	cmd.Flags().StringVar(&deviceID, "device-id", "", "Filter by device ID")
+	cmd.Flags().IntVar(&verbose, "verbose", 100, "Detail level (1-100)")
 
 	return cmd
 }

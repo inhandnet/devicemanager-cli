@@ -1,3 +1,13 @@
+# v0.5.1 (2026-05-08)
+
+## Bug Fixes
+
+- **devicegroup list**: Remove invalid `--cursor`/`--limit` flags (API returns full tree, not paginated); add `--max-depth` flag
+- **tunnel list**: Remove invalid `--cursor`/`--limit` flags (API does not support pagination)
+- **system log list**: Default to last 7 days when `--start-time` is not specified (previously returned API error)
+
+---
+
 # v0.5.0 (2026-05-07)
 
 ## New Features

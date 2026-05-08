@@ -38,7 +38,7 @@ func newCmdLogList(f *factory.Factory) *cobra.Command {
 		Use:     "list",
 		Short:   "List audit logs",
 		Aliases: []string{"ls"},
-		Example: `  # List recent audit logs
+		Example: `  # List audit logs (defaults to last 7 days)
   devicemanager system log list
 
   # Filter by date range
@@ -56,20 +56,25 @@ func newCmdLogList(f *factory.Factory) *cobra.Command {
 			opts.ApplyTo(q)
 			q.Set("language", "1")
 
-			if opts.StartTime != "" {
-				ts, err := parseDateToUnix(opts.StartTime)
-				if err != nil {
-					return fmt.Errorf("invalid --start-time: %w", err)
-				}
-				q.Set("start_time", ts)
+			// Default to last 7 days if --start-time not specified
+			if opts.StartTime == "" {
+				opts.StartTime = time.Now().AddDate(0, 0, -7).Format("2006-01-02")
 			}
-			if opts.EndTime != "" {
-				ts, err := parseDateToUnix(opts.EndTime)
-				if err != nil {
-					return fmt.Errorf("invalid --end-time: %w", err)
-				}
-				q.Set("end_time", ts)
+			if opts.EndTime == "" {
+				opts.EndTime = time.Now().Format("2006-01-02")
 			}
+
+			ts, err := parseDateToUnix(opts.StartTime)
+			if err != nil {
+				return fmt.Errorf("invalid --start-time: %w", err)
+			}
+			q.Set("start_time", ts)
+
+			ts, err = parseDateToUnix(opts.EndTime)
+			if err != nil {
+				return fmt.Errorf("invalid --end-time: %w", err)
+			}
+			q.Set("end_time", ts)
 			cmdutil.SetQueryParam(q, "level", opts.Level)
 
 			output, _ := cmd.Flags().GetString("output")
