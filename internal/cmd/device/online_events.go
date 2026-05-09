@@ -54,8 +54,8 @@ func NewCmdOnlineEvents(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&startTime, "start-time", "", "Start time (YYYY-MM-DD or ISO8601) (required)")
-	cmd.Flags().StringVar(&endTime, "end-time", "", "End time (YYYY-MM-DD or ISO8601) (required)")
+	cmd.Flags().StringVar(&startTime, "start-time", "", "Start time inclusive (YYYY-MM-DD or ISO8601) (required)")
+	cmd.Flags().StringVar(&endTime, "end-time", "", "End time exclusive (YYYY-MM-DD or ISO8601) (required)")
 	_ = cmd.MarkFlagRequired("start-time")
 	_ = cmd.MarkFlagRequired("end-time")
 

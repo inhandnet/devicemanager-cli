@@ -2,8 +2,10 @@ package device
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/tidwall/gjson"
 
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
@@ -23,20 +25,56 @@ func NewCmdConfig(f *factory.Factory) *cobra.Command {
 }
 
 func NewCmdConfigGet(f *factory.Factory) *cobra.Command {
+	var skipRefresh bool
+
 	cmd := &cobra.Command{
-		Use:     "get <device-id>",
-		Short:   "Get device running configuration",
-		Args:    cobra.ExactArgs(1),
-		Example: `  devicemanager device config get <device-id>`,
+		Use:   "get <device-id>",
+		Short: "Get device running configuration",
+		Long: `Fetch the device's running configuration. By default, it first sends a
+"GET RUNNING CONFIG" task to the device to retrieve the latest config.
+If the device is offline or the task fails, the last known config is returned.
+Use --skip-refresh to skip the task and return the cached config directly.`,
+		Args: cobra.ExactArgs(1),
+		Example: `  # Get latest config (sends task to device first)
+  devicemanager device config get <device-id>
+
+  # Get cached config without refreshing
+  devicemanager device config get <device-id> --skip-refresh`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
 				return err
 			}
 
+			deviceID := args[0]
+
+			if !skipRefresh {
+				// Get device name for the task
+				objectName := deviceID
+				if devBody, err := client.Get(fmt.Sprintf("/api/devices/%s", deviceID), nil); err == nil {
+					if name := gjson.GetBytes(devBody, "result.name").String(); name != "" {
+						objectName = name
+					} else if name := gjson.GetBytes(devBody, "name").String(); name != "" {
+						objectName = name
+					}
+				}
+
+				// Send GET RUNNING CONFIG task and wait for completion
+				taskBody := map[string]any{
+					"objectId":   deviceID,
+					"objectName": objectName,
+					"name":       "GET RUNNING CONFIG",
+					"type":       "4",
+					"priority":   30,
+					"timeout":    30000,
+				}
+				fmt.Fprintf(f.IO.ErrOut, "Fetching latest config from device...\n")
+				_, _ = client.Post("/api2/tasks/run", taskBody)
+			}
+
 			output, _ := cmd.Flags().GetString("output")
 
-			body, err := client.Get(fmt.Sprintf("/api/devices/%s/config", args[0]), nil)
+			body, err := client.Get(fmt.Sprintf("/api/devices/%s/config", deviceID), nil)
 			if err != nil {
 				return err
 			}
@@ -44,6 +82,8 @@ func NewCmdConfigGet(f *factory.Factory) *cobra.Command {
 			return iostreams.FormatOutput(body, f.IO, output)
 		},
 	}
+
+	cmd.Flags().BoolVar(&skipRefresh, "skip-refresh", false, "Skip refreshing config from device, return cached config")
 
 	return cmd
 }
@@ -71,8 +111,11 @@ func NewCmdConfigSet(f *factory.Factory) *cobra.Command {
 			}
 
 			if contentFile != "" {
-				// TODO: read file content
-				return fmt.Errorf("--content-file not yet implemented")
+				data, err := os.ReadFile(contentFile)
+				if err != nil {
+					return fmt.Errorf("reading content file: %w", err)
+				}
+				content = string(data)
 			}
 
 			desc, _ := cmd.Flags().GetString("description")

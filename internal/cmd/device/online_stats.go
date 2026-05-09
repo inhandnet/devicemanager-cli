@@ -65,8 +65,8 @@ func NewCmdOnlineStats(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&startTime, "start-time", "", "Start date (YYYY-MM-DD) (required)")
-	cmd.Flags().StringVar(&endTime, "end-time", "", "End date (YYYY-MM-DD) (required)")
+	cmd.Flags().StringVar(&startTime, "start-time", "", "Start date inclusive (YYYY-MM-DD) (required)")
+	cmd.Flags().StringVar(&endTime, "end-time", "", "End date exclusive (YYYY-MM-DD) (required)")
 	cmd.Flags().StringSliceVar(&deviceIDs, "device-id", nil, "Device ID(s) to query (required, repeatable)")
 	_ = cmd.MarkFlagRequired("start-time")
 	_ = cmd.MarkFlagRequired("end-time")

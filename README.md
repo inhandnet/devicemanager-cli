@@ -99,9 +99,9 @@ devicemanager device reboot <device-id> --timeout 15000            # Reboot (mil
 # Device traffic
 devicemanager device traffic monthly 202604 <device-id>            # Monthly traffic
 devicemanager device traffic daily 202604 <device-id>              # Daily traffic
-devicemanager device traffic hourly <device-id>                    # Hourly traffic (last 24h)
+devicemanager device traffic hourly <device-id>                    # Hourly traffic (default: last 2 days)
 devicemanager device traffic hourly <device-id> --after 2026-04-25 --before 2026-04-27  # Custom range (max 6 days)
-devicemanager device traffic top --date 2026-04-01 --limit 10      # Top 10 devices by traffic
+devicemanager device traffic top --date 2026-04 --limit 10         # Top 10 devices by traffic
 
 # Device count trends
 devicemanager device count online --start-time 1714492800 --end-time 1717084800  # Online count (unix timestamp)

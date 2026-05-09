@@ -47,8 +47,8 @@ func NewCmdSignal(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&after, "after", "", "Start time (ISO 8601, e.g. 2026-05-01T00:00:00Z) (required)")
-	cmd.Flags().StringVar(&before, "before", "", "End time (ISO 8601, defaults to now)")
+	cmd.Flags().StringVar(&after, "after", "", "Start time inclusive (ISO 8601, e.g. 2026-05-01T00:00:00Z) (required)")
+	cmd.Flags().StringVar(&before, "before", "", "End time exclusive (ISO 8601, defaults to now)")
 	_ = cmd.MarkFlagRequired("after")
 
 	return cmd

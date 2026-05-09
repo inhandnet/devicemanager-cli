@@ -60,6 +60,12 @@ func FormatOutput(body []byte, io *IOStreams, output string, opts ...FormatOptio
 		opt(&o)
 	}
 
+	// Check for empty results
+	if isEmptyResult(body) {
+		fmt.Fprintln(io.ErrOut, "No results.")
+		return nil
+	}
+
 	// --jq overrides output mode
 	if io.JQExpr != "" {
 		result, err := ApplyJQ(unwrapResult(normalizePage(body)), io.JQExpr)
@@ -126,6 +132,22 @@ func normalizePage(data []byte) []byte {
 }
 
 // unwrapResult strips the envelope when the JSON object has "result" as its only key.
+// isEmptyResult checks if the response contains no data.
+// Matches: [], {"result":[],...}, or {"result":null,...}
+func isEmptyResult(data []byte) bool {
+	parsed := gjson.ParseBytes(data)
+	if parsed.IsArray() && len(parsed.Array()) == 0 {
+		return true
+	}
+	if parsed.IsObject() {
+		result := parsed.Get("result")
+		if result.Exists() && result.IsArray() && len(result.Array()) == 0 {
+			return true
+		}
+	}
+	return false
+}
+
 func unwrapResult(data []byte) []byte {
 	var raw map[string]json.RawMessage
 	if err := json.Unmarshal(data, &raw); err != nil {

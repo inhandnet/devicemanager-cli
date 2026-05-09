@@ -1,3 +1,28 @@
+# v0.5.3 (2026-05-09)
+
+## New Features
+
+### Config Get Refresh
+- `device config get` now sends a "GET RUNNING CONFIG" task to the device before fetching config, ensuring the latest configuration is returned
+- Use `--skip-refresh` to skip the task and return cached config directly
+
+### Traffic Table Formatting
+- Traffic columns (`send`, `receive`, `total`, `max`) now display human-readable sizes in table mode (e.g. `4.0 MiB` instead of `4194304`)
+- JSON/YAML output retains raw byte values
+
+### Empty Result Hint
+- Display `No results.` when a query returns empty data, instead of showing nothing
+
+## Improvements
+
+- `device config set --content-file` now implemented (was previously TODO)
+- `device traffic top --date` accepts `YYYY-MM` format (e.g. `2026-05`), defaults to current month if omitted
+- All time range flags now document left-closed right-open semantics (`inclusive`/`exclusive`)
+- `device traffic hourly` default range changed from 24 hours to 2 days (yesterday to tomorrow)
+- `system log list --end-time` default changed to tomorrow (right-open)
+
+---
+
 # v0.5.2 (2026-05-08)
 
 ## Bug Fixes

@@ -11,6 +11,13 @@ import (
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
+var trafficFormatters = iostreams.ColumnFormatters{
+	"send":    iostreams.FormatBytes,
+	"receive": iostreams.FormatBytes,
+	"total":   iostreams.FormatBytes,
+	"max":     iostreams.FormatBytes,
+}
+
 func NewCmdTraffic(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "traffic",
@@ -51,7 +58,8 @@ func NewCmdTrafficMonthly(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			return iostreams.FormatOutput(resp, f.IO, output)
+			return iostreams.FormatOutput(resp, f.IO, output,
+				iostreams.WithFormatters(trafficFormatters))
 		},
 	}
 
@@ -84,7 +92,8 @@ func NewCmdTrafficDaily(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			return iostreams.FormatOutput(body, f.IO, output)
+			return iostreams.FormatOutput(body, f.IO, output,
+				iostreams.WithFormatters(trafficFormatters))
 		},
 	}
 
@@ -111,12 +120,13 @@ func NewCmdTrafficHourly(f *factory.Factory) *cobra.Command {
 			after, _ := cmd.Flags().GetString("after")
 			before, _ := cmd.Flags().GetString("before")
 
-			// Default to last 24 hours
+			// Default to last 2 days (left-closed, right-open: after ≤ data < before)
+			// e.g. today is 9th → after=8th, before=10th → returns 8th and 9th data
 			if after == "" {
 				after = time.Now().AddDate(0, 0, -1).Format("2006-01-02")
 			}
 			if before == "" {
-				before = time.Now().Format("2006-01-02")
+				before = time.Now().AddDate(0, 0, 1).Format("2006-01-02")
 			}
 
 			q := url.Values{}
@@ -130,12 +140,13 @@ func NewCmdTrafficHourly(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			return iostreams.FormatOutput(body, f.IO, output)
+			return iostreams.FormatOutput(body, f.IO, output,
+				iostreams.WithFormatters(trafficFormatters))
 		},
 	}
 
-	cmd.Flags().String("after", "", "Start date (YYYY-MM-DD)")
-	cmd.Flags().String("before", "", "End date (YYYY-MM-DD, max 6 days from after)")
+	cmd.Flags().String("after", "", "Start date inclusive (YYYY-MM-DD, default: yesterday)")
+	cmd.Flags().String("before", "", "End date exclusive (YYYY-MM-DD, default: tomorrow, max 6 days from after)")
 
 	return cmd
 }

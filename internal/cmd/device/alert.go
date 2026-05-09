@@ -70,8 +70,8 @@ func NewCmdAlert(f *factory.Factory) *cobra.Command {
 	opts.Register(cmd)
 	cmd.Flags().StringVar(&opts.DeviceName, "device-name", "", "Filter by device name")
 	cmd.Flags().StringVar(&opts.RuleName, "rule-name", "", "Filter by rule name")
-	cmd.Flags().StringVar(&opts.StartTime, "start-time", "", "Filter by start time (YYYY-MM-DD or unix timestamp)")
-	cmd.Flags().StringVar(&opts.EndTime, "end-time", "", "Filter by end time (YYYY-MM-DD or unix timestamp)")
+	cmd.Flags().StringVar(&opts.StartTime, "start-time", "", "Start time inclusive (YYYY-MM-DD or unix timestamp)")
+	cmd.Flags().StringVar(&opts.EndTime, "end-time", "", "End time exclusive (YYYY-MM-DD or unix timestamp)")
 	cmd.Flags().StringVar(&opts.State, "state", "", "Filter by state (confirmed/unconfirmed)")
 
 	return cmd

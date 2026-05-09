@@ -55,12 +55,12 @@ func newCmdLogList(f *factory.Factory) *cobra.Command {
 			q := url.Values{}
 			opts.ApplyTo(q)
 
-			// Default to last 7 days if --start-time not specified
+			// Default to last 7 days (left-closed, right-open: start ≤ data < end)
 			if opts.StartTime == "" {
 				opts.StartTime = time.Now().AddDate(0, 0, -7).Format("2006-01-02")
 			}
 			if opts.EndTime == "" {
-				opts.EndTime = time.Now().Format("2006-01-02")
+				opts.EndTime = time.Now().AddDate(0, 0, 1).Format("2006-01-02")
 			}
 
 			ts, err := parseDateToUnix(opts.StartTime)
@@ -89,8 +89,8 @@ func newCmdLogList(f *factory.Factory) *cobra.Command {
 	}
 
 	opts.Register(cmd)
-	cmd.Flags().StringVar(&opts.StartTime, "start-time", "", "Start date (YYYY-MM-DD)")
-	cmd.Flags().StringVar(&opts.EndTime, "end-time", "", "End date (YYYY-MM-DD)")
+	cmd.Flags().StringVar(&opts.StartTime, "start-time", "", "Start date inclusive (YYYY-MM-DD, default: 7 days ago)")
+	cmd.Flags().StringVar(&opts.EndTime, "end-time", "", "End date exclusive (YYYY-MM-DD, default: tomorrow)")
 	cmd.Flags().StringVar(&opts.Level, "level", "", "Filter by level (info, warning, error)")
 
 	return cmd
