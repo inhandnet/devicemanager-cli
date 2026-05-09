@@ -148,24 +148,65 @@ func NewCmdConfigSet(f *factory.Factory) *cobra.Command {
 }
 
 func NewCmdConfigExport(f *factory.Factory) *cobra.Command {
-	return &cobra.Command{
+	var outputFile string
+
+	cmd := &cobra.Command{
 		Use:   "export <device-id>",
-		Short: "Export device configuration",
-		Args:  cobra.ExactArgs(1),
+		Short: "Export device configuration to a file",
+		Example: `  # Export to current directory (filename from server)
+  devicemanager device config export <device-id>
+
+  # Export to a specific path
+  devicemanager device config export <device-id> --file ./my-config.dat`,
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
 				return err
 			}
 
-			output, _ := cmd.Flags().GetString("output")
+			deviceID := args[0]
 
-			body, err := client.Get(fmt.Sprintf("/api/devices/%s/config/export", args[0]), nil)
+			// Step 1: Get export file metadata
+			body, err := client.Get(fmt.Sprintf("/api/devices/%s/config/export", deviceID), nil)
 			if err != nil {
 				return err
 			}
 
-			return iostreams.FormatOutput(body, f.IO, output)
+			// Unwrap result envelope
+			fileID := gjson.GetBytes(body, "result._id").String()
+			if fileID == "" {
+				fileID = gjson.GetBytes(body, "_id").String()
+			}
+			if fileID == "" {
+				return fmt.Errorf("export failed: no file ID in response")
+			}
+
+			fileName := gjson.GetBytes(body, "result.name").String()
+			if fileName == "" {
+				fileName = gjson.GetBytes(body, "name").String()
+			}
+			if fileName == "" {
+				fileName = deviceID + ".dat"
+			}
+
+			// Determine output path
+			dest := outputFile
+			if dest == "" {
+				dest = fileName
+			}
+
+			// Step 2: Download the file
+			if err := client.Download(fmt.Sprintf("/api/file/%s/raw", fileID), dest); err != nil {
+				return fmt.Errorf("downloading config file: %w", err)
+			}
+
+			fmt.Fprintf(f.IO.Out, "Configuration exported to %s\n", dest)
+			return nil
 		},
 	}
+
+	cmd.Flags().StringVarP(&outputFile, "file", "f", "", "Output file path (default: server filename in current directory)")
+
+	return cmd
 }

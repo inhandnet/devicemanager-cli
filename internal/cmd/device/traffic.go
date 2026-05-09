@@ -28,6 +28,7 @@ func NewCmdTraffic(f *factory.Factory) *cobra.Command {
 	cmd.AddCommand(NewCmdTrafficDaily(f))
 	cmd.AddCommand(NewCmdTrafficHourly(f))
 	cmd.AddCommand(NewCmdTrafficTop(f))
+	cmd.AddCommand(NewCmdTrafficStats(f))
 
 	return cmd
 }

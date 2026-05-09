@@ -102,6 +102,7 @@ devicemanager device traffic daily 202604 <device-id>              # Daily traff
 devicemanager device traffic hourly <device-id>                    # Hourly traffic (default: last 2 days)
 devicemanager device traffic hourly <device-id> --after 2026-04-25 --before 2026-04-27  # Custom range (max 6 days)
 devicemanager device traffic top --date 2026-04 --limit 10         # Top 10 devices by traffic
+devicemanager device traffic stats --after 2026-05-01 --before 2026-05-10  # Traffic stats per device
 
 # Device count trends
 devicemanager device count online --start-time 1714492800 --end-time 1717084800  # Online count (unix timestamp)
@@ -142,11 +143,13 @@ devicemanager device alert-rule enable <rule-id>                   # Enable rule
 devicemanager device alert-rule disable <rule-id>                  # Disable rule
 devicemanager device alert-rule delete <rule-id>                   # Delete rule
 
-# Online statistics
+# Online statistics (per device, with pagination)
 devicemanager device online-stats \
-  --device-id <id> \
-  --start-time 2026-04-23 \
-  --end-time 2026-04-30        # Query online stats (rate, durations, etc.)
+  --start-time 2026-05-01 \
+  --end-time 2026-05-09                                            # All devices
+devicemanager device online-stats \
+  --start-time 2026-05-01 \
+  --end-time 2026-05-09 --name router --online 1                   # Filter by name + online
 
 # Device event logs (for troubleshooting)
 devicemanager device online-events <device-id> \
@@ -156,7 +159,8 @@ devicemanager device register-events <serial-number>               # Registratio
 # Device configuration
 devicemanager device config get <device-id>                        # Get running config
 devicemanager device config set <device-id> --content "..."        # Push configuration
-devicemanager device config export <device-id>                     # Export configuration
+devicemanager device config export <device-id>                     # Export to current directory
+devicemanager device config export <device-id> --file ./config.dat # Export to specific path
 ```
 
 ### Device groups

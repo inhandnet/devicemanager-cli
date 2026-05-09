@@ -1,3 +1,17 @@
+# v0.5.4 (2026-05-09)
+
+## New Features
+
+- Add `device traffic stats` command — query traffic statistics per device with pagination, filtering by name/model/online status, and auto-merging device info with traffic data
+- `device online-stats` redesigned — auto-fetches device list instead of requiring `--device-id`; supports `--name`, `--model`, `--online` filters and pagination; formats duration columns in table mode
+- `device online-stats --end-time` now sets end of day to 23:59:59 (if today, uses current time)
+
+## Improvements
+
+- `device config export` now downloads the config file directly (previously only returned metadata). Supports `--file` for custom output path, defaults to server filename in current directory
+
+---
+
 # v0.5.3 (2026-05-09)
 
 ## New Features
