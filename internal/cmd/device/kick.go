@@ -15,11 +15,11 @@ func NewCmdKick(f *factory.Factory) *cobra.Command {
 	var yes bool
 
 	cmd := &cobra.Command{
-		Use:   "kick <device-id>",
-		Short: "Force disconnect a device",
-		Long:  "Force disconnect a device from the platform. The device will attempt to reconnect automatically.",
+		Use:     "kick <device-id>",
+		Short:   "Force disconnect a device",
+		Long:    "Force disconnect a device from the platform. The device will attempt to reconnect automatically.",
 		Example: `  devicemanager device kick 5d6349d6335c8c000178a194`,
-		Args: cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !ui.Confirm(f.IO, fmt.Sprintf("Kick device %s?", args[0]), yes) {
 				return nil

@@ -101,12 +101,11 @@ devicemanager device traffic monthly 202604 <device-id>            # Monthly tra
 devicemanager device traffic daily 202604 <device-id>              # Daily traffic
 devicemanager device traffic hourly <device-id>                    # Hourly traffic (last 24h)
 devicemanager device traffic hourly <device-id> --after 2026-04-25 --before 2026-04-27  # Custom range (max 6 days)
-devicemanager device traffic top --date 202604                     # Top devices by monthly traffic
-devicemanager device traffic top --date 202604 --limit 10          # Top 10
+devicemanager device traffic top --date 2026-04-01 --limit 10      # Top 10 devices by traffic
 
 # Device count trends
-devicemanager device count online --start-time 1714492800 --end-time 1717084800  # Online count over time
-devicemanager device count total --start-time 1714492800 --end-time 1717084800   # Total count over time
+devicemanager device count online --start-time 1714492800 --end-time 1717084800  # Online count (unix timestamp)
+devicemanager device count total --start-time 2026-04-01 --end-time 2026-05-01   # Total count (YYYY-MM-DD)
 
 # Device clients
 devicemanager device clients list <device-id>                      # List connected clients
@@ -279,7 +278,7 @@ devicemanager edge control restart <device-id> <app-id>       # Restart applicat
 devicemanager task list                                            # List all tasks
 devicemanager task list --status running                           # Filter by status (running/waiting/failed/completed)
 devicemanager task list --type firmware_upgrade                    # Filter by task type
-devicemanager task list --device-name router                       # Filter by device name
+devicemanager task list --object-id <device-id>                    # Filter by device ID
 devicemanager task cancel <task-id>                                # Cancel a task
 devicemanager task restart <task-id>                               # Restart a task
 ```

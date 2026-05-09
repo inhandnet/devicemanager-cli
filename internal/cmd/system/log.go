@@ -54,7 +54,6 @@ func newCmdLogList(f *factory.Factory) *cobra.Command {
 
 			q := url.Values{}
 			opts.ApplyTo(q)
-			q.Set("language", "1")
 
 			// Default to last 7 days if --start-time not specified
 			if opts.StartTime == "" {

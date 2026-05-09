@@ -147,10 +147,11 @@ func newCmdUserCreate(f *factory.Factory) *cobra.Command {
 
 	cmd.Flags().StringVar(&name, "name", "", "User name")
 	cmd.Flags().StringVar(&email, "email", "", "User email (required)")
-	cmd.Flags().StringVar(&roleID, "role-id", "", "Role ID (use 'system role list' to find IDs)")
+	cmd.Flags().StringVar(&roleID, "role-id", "", "Role ID (required, use 'system role list' to find IDs)")
 	cmd.Flags().BoolVar(&external, "external", false, "Create as external user")
 	cmd.Flags().StringVar(&lang, "lang", "", `Invitation email language: "en" (default) or "zh"`)
 	_ = cmd.MarkFlagRequired("email")
+	_ = cmd.MarkFlagRequired("role-id")
 
 	return cmd
 }

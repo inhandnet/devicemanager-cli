@@ -32,7 +32,7 @@ func NewCmdDevicesRemove(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Delete(fmt.Sprintf("/api/jobs/%s/devices/%s", firmwareID, deviceID))
+			resp, err := client.Delete(fmt.Sprintf("/api/job/%s/devices/%s", firmwareID, deviceID))
 			if err != nil {
 				return err
 			}

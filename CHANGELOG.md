@@ -1,14 +1,30 @@
-# v0.5.1 (2026-05-08)
+# v0.5.2 (2026-05-08)
 
 ## Bug Fixes
 
-- **devicegroup list**: Remove invalid `--cursor`/`--limit` flags (API returns full tree, not paginated); add `--max-depth` flag
-- **tunnel list**: Remove invalid `--cursor`/`--limit` flags (API does not support pagination)
-- **system log list**: Default to last 7 days when `--start-time` is not specified (previously returned API error)
-- **device count online/total**: Fix parameter names from `--after`/`--before` to `--start-time`/`--end-time` to match API
-- **device traffic top**: Fix parameter name from `--month` to `--date` to match API
+### API Path Fixes
+- **firmware list**: `/api/firmwares` → `/api/firmware`
+- **firmware devices list**: `/api/jobs/{id}/devices` → `/api/job/{id}/devices`
+- **firmware devices add**: `/api/firmwares/{id}/devices` → `/api/firmware/{id}/devices`
+- **firmware devices remove**: `/api/jobs/{id}/devices/{did}` → `/api/job/{id}/devices/{did}`
+- **firmware upgrade**: `/api/devices/{id}/upgrade` → `/api/device/{id}/upgrade`
+- **edge control start/stop/restart**: GET → POST, path `.../app/{appId}/start` → `.../apps/start` + body `{apps:[appId]}`
+
+### Parameter Fixes
+- **task list**: Parameter names `status`→`states`, `type`→`types`, `device_name`→`object_id`; flag `--device-name` → `--object-id`
+- **device count total**: Fix `--start-time/--end-time` format from unix timestamp to YYYY-MM-DD
+- **device traffic top**: Fix `--month` → `--date`, format from YYYYMM to YYYY-MM-DD; `--limit` defaults to 10
+- **device alert**: Fix `--start-time/--end-time` to convert YYYY-MM-DD to unix timestamp (supports both formats)
+- **alert-rule update**: Fix GET response `result` unwrap; use raw JSON merge to preserve field types; send all required mutable fields on PUT
+
+### Missing Field / Default Fixes
+- **firmware upload**: Add missing `filename` form field
+- **system log list**: Remove extra `language=1`; default to last 7 days
+- **system user create**: Mark `--role-id` as required
 - **device signal**: Make `--before` optional (defaults to now)
-- **firmware upload**: Fix missing `filename` form field (caused "Miss required parameter" error)
+- **device traffic hourly**: Default to last 24 hours when `--after/--before` not specified
+- **devicegroup list**: Remove invalid `--cursor/--limit`; add `--max-depth`
+- **tunnel list**: Remove invalid `--cursor/--limit`
 
 ## Improvements
 
@@ -16,6 +32,18 @@
 - Add Long descriptions and Examples to destructive commands (device delete/kick/reboot, permission add/remove)
 - Add Long description and Example to `firmware upload` explaining the fid workflow
 - Improve flag help text with format examples, enum values, and default value explanations across device, firmware, system, tunnel, edge, and alert-rule commands
+
+- Fix gofmt formatting issues in kick.go and traffic_top.go
+
+---
+
+# v0.5.1 (2026-05-08)
+
+## Bug Fixes
+
+- **devicegroup list**: Remove invalid `--cursor`/`--limit` flags (API returns full tree, not paginated); add `--max-depth` flag
+- **tunnel list**: Remove invalid `--cursor`/`--limit` flags (API does not support pagination)
+- **system log list**: Default to last 7 days when `--start-time` is not specified (previously returned API error)
 
 ---
 

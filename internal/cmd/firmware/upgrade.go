@@ -42,7 +42,7 @@ func NewCmdUpgrade(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Post(fmt.Sprintf("/api/devices/%s/upgrade", deviceID), body)
+			resp, err := client.Post(fmt.Sprintf("/api/device/%s/upgrade", deviceID), body)
 			if err != nil {
 				return err
 			}

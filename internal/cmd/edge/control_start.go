@@ -25,7 +25,8 @@ func newCmdControlStart(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Get(fmt.Sprintf("/api/edge/devices/%s/app/%s/start", deviceID, appID), nil)
+			body := map[string]any{"apps": []string{appID}}
+			resp, err := client.Post(fmt.Sprintf("/api/edge/devices/%s/apps/start", deviceID), body)
 			if err != nil {
 				return err
 			}

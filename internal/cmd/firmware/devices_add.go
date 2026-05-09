@@ -34,7 +34,7 @@ func NewCmdDevicesAdd(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Post(fmt.Sprintf("/api/firmwares/%s/devices", firmwareID), body)
+			resp, err := client.Post(fmt.Sprintf("/api/firmware/%s/devices", firmwareID), body)
 			if err != nil {
 				return err
 			}

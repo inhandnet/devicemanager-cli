@@ -1,7 +1,10 @@
 package device
 
 import (
+	"fmt"
 	"net/url"
+	"strconv"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -36,8 +39,20 @@ func NewCmdAlert(f *factory.Factory) *cobra.Command {
 			opts.ApplyTo(q)
 			cmdutil.SetQueryParam(q, "device_name", opts.DeviceName)
 			cmdutil.SetQueryParam(q, "rule_name", opts.RuleName)
-			cmdutil.SetQueryParam(q, "start_time", opts.StartTime)
-			cmdutil.SetQueryParam(q, "end_time", opts.EndTime)
+			if opts.StartTime != "" {
+				ts, err := toUnixTimestamp(opts.StartTime)
+				if err != nil {
+					return fmt.Errorf("invalid --start-time: %w", err)
+				}
+				q.Set("start_time", ts)
+			}
+			if opts.EndTime != "" {
+				ts, err := toUnixTimestamp(opts.EndTime)
+				if err != nil {
+					return fmt.Errorf("invalid --end-time: %w", err)
+				}
+				q.Set("end_time", ts)
+			}
 			cmdutil.SetQueryParam(q, "state", opts.State)
 
 			output, _ := cmd.Flags().GetString("output")
@@ -55,9 +70,23 @@ func NewCmdAlert(f *factory.Factory) *cobra.Command {
 	opts.Register(cmd)
 	cmd.Flags().StringVar(&opts.DeviceName, "device-name", "", "Filter by device name")
 	cmd.Flags().StringVar(&opts.RuleName, "rule-name", "", "Filter by rule name")
-	cmd.Flags().StringVar(&opts.StartTime, "start-time", "", "Filter by start time (ISO8601)")
-	cmd.Flags().StringVar(&opts.EndTime, "end-time", "", "Filter by end time (ISO8601)")
+	cmd.Flags().StringVar(&opts.StartTime, "start-time", "", "Filter by start time (YYYY-MM-DD or unix timestamp)")
+	cmd.Flags().StringVar(&opts.EndTime, "end-time", "", "Filter by end time (YYYY-MM-DD or unix timestamp)")
 	cmd.Flags().StringVar(&opts.State, "state", "", "Filter by state (confirmed/unconfirmed)")
 
 	return cmd
+}
+
+// toUnixTimestamp converts a date string (YYYY-MM-DD) or unix timestamp string to unix timestamp string.
+func toUnixTimestamp(s string) (string, error) {
+	// Already a unix timestamp?
+	if _, err := strconv.ParseInt(s, 10, 64); err == nil {
+		return s, nil
+	}
+	// Try YYYY-MM-DD
+	t, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		return "", fmt.Errorf("expected YYYY-MM-DD or unix timestamp, got %q", s)
+	}
+	return strconv.FormatInt(t.Unix(), 10), nil
 }

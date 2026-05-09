@@ -27,9 +27,9 @@ func NewCmdTask(f *factory.Factory) *cobra.Command {
 
 type TaskListOptions struct {
 	cmdutil.ListFlags
-	Status     string
-	TaskType   string
-	DeviceName string
+	Status   string
+	TaskType string
+	ObjectID string
 }
 
 func newCmdTaskList(f *factory.Factory) *cobra.Command {
@@ -56,9 +56,9 @@ func newCmdTaskList(f *factory.Factory) *cobra.Command {
 			q := url.Values{}
 			opts.ApplyTo(q)
 			q.Set("verbose", "50")
-			cmdutil.SetQueryParam(q, "status", opts.Status)
-			cmdutil.SetQueryParam(q, "type", opts.TaskType)
-			cmdutil.SetQueryParam(q, "device_name", opts.DeviceName)
+			cmdutil.SetQueryParam(q, "states", opts.Status)
+			cmdutil.SetQueryParam(q, "types", opts.TaskType)
+			cmdutil.SetQueryParam(q, "object_id", opts.ObjectID)
 
 			output, _ := cmd.Flags().GetString("output")
 
@@ -76,7 +76,7 @@ func newCmdTaskList(f *factory.Factory) *cobra.Command {
 	opts.Register(cmd)
 	cmd.Flags().StringVar(&opts.Status, "status", "", "Filter by status (running/waiting/failed/completed)")
 	cmd.Flags().StringVar(&opts.TaskType, "type", "", "Filter by task type")
-	cmd.Flags().StringVar(&opts.DeviceName, "device-name", "", "Filter by device name")
+	cmd.Flags().StringVar(&opts.ObjectID, "object-id", "", "Filter by device ID")
 
 	return cmd
 }

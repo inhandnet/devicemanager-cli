@@ -3,6 +3,7 @@ package device
 import (
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -110,13 +111,17 @@ func NewCmdTrafficHourly(f *factory.Factory) *cobra.Command {
 			after, _ := cmd.Flags().GetString("after")
 			before, _ := cmd.Flags().GetString("before")
 
+			// Default to last 24 hours
+			if after == "" {
+				after = time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+			}
+			if before == "" {
+				before = time.Now().Format("2006-01-02")
+			}
+
 			q := url.Values{}
-			if after != "" {
-				q.Set("after", after)
-			}
-			if before != "" {
-				q.Set("before", before)
-			}
+			q.Set("after", after)
+			q.Set("before", before)
 
 			output, _ := cmd.Flags().GetString("output")
 

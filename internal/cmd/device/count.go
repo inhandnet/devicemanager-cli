@@ -95,8 +95,8 @@ func newCmdCountTotal(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&startTime, "start-time", "", "Start time as unix timestamp (e.g. 1714492800)")
-	cmd.Flags().StringVar(&endTime, "end-time", "", "End time as unix timestamp (e.g. 1717084800)")
+	cmd.Flags().StringVar(&startTime, "start-time", "", "Start date (YYYY-MM-DD, e.g. 2026-04-01)")
+	cmd.Flags().StringVar(&endTime, "end-time", "", "End date (YYYY-MM-DD, e.g. 2026-05-01)")
 
 	return cmd
 }

@@ -1,6 +1,8 @@
 package device
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -9,6 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	inapi "github.com/inhandnet/devicemanager-cli/internal/api"
 	"github.com/inhandnet/devicemanager-cli/internal/cmdutil"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
@@ -247,7 +250,50 @@ func newCmdAlertRuleUpdate(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			body := map[string]any{}
+			// GET current rule — API requires all mutable fields on PUT.
+			// Use raw JSON merge to preserve exact field types and values.
+			current, err := client.Get(fmt.Sprintf("/api/alert-rules/%s?verbose=100", args[0]), nil)
+			if err != nil {
+				return fmt.Errorf("fetching current rule: %w", err)
+			}
+
+			// Unwrap "result" envelope if present
+			var envelope struct {
+				Result json.RawMessage `json:"result"`
+			}
+			ruleJSON := current
+			if json.Unmarshal(current, &envelope) == nil && len(envelope.Result) > 0 {
+				ruleJSON = envelope.Result
+			}
+
+			// Parse into raw map preserving JSON number types
+			var rawRule map[string]json.RawMessage
+			if err := json.Unmarshal(ruleJSON, &rawRule); err != nil {
+				return fmt.Errorf("parsing current rule: %w", err)
+			}
+
+			// Build body from allowed mutable fields, preserving original JSON values
+			allowedKeys := []string{"name", "forDevice", "notify", "customAlertTime",
+				"offsetTotalSec", "alertTimeRangeStartSecOfDay", "alertTimeRangeEndSecOfDay", "webhook"}
+			patchRule := make(map[string]json.RawMessage)
+			for _, k := range allowedKeys {
+				if v, ok := rawRule[k]; ok {
+					patchRule[k] = v
+				}
+			}
+			// Ensure required fields have defaults
+			if _, ok := patchRule["forDevice"]; !ok {
+				patchRule["forDevice"] = json.RawMessage(`{"type":"ALL"}`)
+			}
+			if _, ok := patchRule["notify"]; !ok {
+				patchRule["notify"] = json.RawMessage(`{}`)
+			}
+			if _, ok := patchRule["webhook"]; !ok {
+				patchRule["webhook"] = json.RawMessage(`{}`)
+			}
+
+			// Apply user overrides — marshal changed values into the patch
+			body := make(map[string]any) // for tracking overrides only
 			if cmd.Flags().Changed("name") {
 				v, _ := cmd.Flags().GetString("name")
 				body["name"] = v
@@ -309,13 +355,26 @@ func newCmdAlertRuleUpdate(f *factory.Factory) *cobra.Command {
 				}
 			}
 
-			if len(body) == 0 {
+			hasChanges := cmd.Flags().Changed("name") || cmd.Flags().Changed("for-device-type") ||
+				cmd.Flags().Changed("for-device-value") || cmd.Flags().Changed("notify-users") ||
+				cmd.Flags().Changed("notify-types") || cmd.Flags().Changed("notify-delay") ||
+				cmd.Flags().Changed("webhook-url") || cmd.Flags().Changed("alert-time-start") ||
+				cmd.Flags().Changed("alert-time-end")
+			if !hasChanges {
 				return fmt.Errorf("at least one flag is required")
 			}
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Put(fmt.Sprintf("/api/alert-rules/%s", args[0]), body)
+			// Merge overrides into patchRule
+			for k, v := range body {
+				b, _ := json.Marshal(v)
+				patchRule[k] = json.RawMessage(b)
+			}
+
+			patchJSON, _ := json.Marshal(patchRule)
+			resp, err := client.Do("PUT", fmt.Sprintf("/api/alert-rules/%s", args[0]),
+				&inapi.RequestOptions{RawBody: bytes.NewReader(patchJSON), ContentType: "application/json"})
 			if err != nil {
 				return err
 			}

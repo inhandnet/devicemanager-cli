@@ -36,7 +36,7 @@ func NewCmdList(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			body, err := client.Get("/api/firmwares", q)
+			body, err := client.Get("/api/firmware", q)
 			if err != nil {
 				return err
 			}

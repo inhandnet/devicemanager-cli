@@ -39,7 +39,7 @@ func NewCmdDevicesList(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			body, err := client.Get(fmt.Sprintf("/api/jobs/%s/devices", args[0]), q)
+			body, err := client.Get(fmt.Sprintf("/api/job/%s/devices", args[0]), q)
 			if err != nil {
 				return err
 			}
