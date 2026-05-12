@@ -42,7 +42,6 @@ type ListFlags struct {
 func (lf *ListFlags) Register(cmd *cobra.Command) {
 	cmd.Flags().IntVar(&lf.Cursor, "cursor", 0, "Skip N items (pagination offset)")
 	cmd.Flags().IntVar(&lf.Limit, "limit", 20, "Number of items per page")
-	cmd.Flags().IntVar(&lf.Verbose, "verbose", 10, "Detail level (1-100, higher = more fields)")
 
 	// AI-friendly aliases for --limit
 	for _, alias := range []string{"page-size", "per-page"} {
@@ -58,9 +57,6 @@ func (lf *ListFlags) ApplyTo(q url.Values) {
 	}
 	if lf.Limit > 0 {
 		q.Set("limit", strconv.Itoa(lf.Limit))
-	}
-	if lf.Verbose > 0 {
-		q.Set("verbose", strconv.Itoa(lf.Verbose))
 	}
 }
 

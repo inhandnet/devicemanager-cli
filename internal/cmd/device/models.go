@@ -1,6 +1,8 @@
 package device
 
 import (
+	"net/url"
+
 	"github.com/spf13/cobra"
 
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
@@ -20,7 +22,10 @@ func NewCmdModels(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			body, err := client.Get("/api/models", nil)
+			q := url.Values{}
+			q.Set("limit", "0")
+
+			body, err := client.Get("/api/models", q)
 			if err != nil {
 				return err
 			}

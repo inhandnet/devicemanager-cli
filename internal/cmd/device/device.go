@@ -32,6 +32,8 @@ func NewCmdDevice(f *factory.Factory) *cobra.Command {
 	cmd.AddCommand(NewCmdModels(f))
 	cmd.AddCommand(NewCmdStats(f))
 	cmd.AddCommand(NewCmdCount(f))
+	cmd.AddCommand(NewCmdImport(f))
+	cmd.AddCommand(NewCmdWeb(f))
 
 	return cmd
 }

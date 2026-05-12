@@ -6,7 +6,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/inhandnet/devicemanager-cli/internal/cmdutil"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 	"github.com/inhandnet/devicemanager-cli/internal/ui"
@@ -28,12 +27,15 @@ func NewCmdUser(f *factory.Factory) *cobra.Command {
 }
 
 func newCmdUserList(f *factory.Factory) *cobra.Command {
-	var flags cmdutil.ListFlags
-
 	cmd := &cobra.Command{
 		Use:     "list",
 		Short:   "List users in the organization",
 		Aliases: []string{"ls"},
+		Example: `  # List users in current organization
+  devicemanager system user list
+
+  # List users in a specific organization
+  devicemanager system user list --oid <org-id>`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -41,8 +43,11 @@ func newCmdUserList(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			flags.ApplyTo(q)
-			q.Set("verbose", "100")
+			q.Set("limit", "0")
+
+			if oid, _ := cmd.Flags().GetString("oid"); oid != "" {
+				q.Set("oid", oid)
+			}
 
 			output, _ := cmd.Flags().GetString("output")
 
@@ -56,7 +61,7 @@ func newCmdUserList(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	flags.Register(cmd)
+	cmd.Flags().String("oid", "", "Organization ID (list users of a specific org)")
 
 	return cmd
 }
@@ -73,7 +78,7 @@ func newCmdUserGet(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			q.Set("verbose", "100")
+
 
 			output, _ := cmd.Flags().GetString("output")
 

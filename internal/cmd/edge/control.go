@@ -15,6 +15,7 @@ func newCmdControl(f *factory.Factory) *cobra.Command {
 	cmd.AddCommand(newCmdControlStart(f))
 	cmd.AddCommand(newCmdControlStop(f))
 	cmd.AddCommand(newCmdControlRestart(f))
+	cmd.AddCommand(newCmdControlRemove(f))
 
 	return cmd
 }

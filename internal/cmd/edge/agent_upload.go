@@ -3,6 +3,7 @@ package edge
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -36,7 +37,7 @@ func newCmdAgentUpload(f *factory.Factory) *cobra.Command {
 			if desc != "" {
 				uploadURL = fmt.Sprintf("%s?description=%s", uploadURL, desc)
 			}
-			resp, err := client.Upload(uploadURL, "file", filePath, file)
+			resp, err := client.Upload(uploadURL, "file", filepath.Base(filePath), file)
 			if err != nil {
 				return err
 			}

@@ -18,6 +18,8 @@ func newCmdAgent(f *factory.Factory) *cobra.Command {
 	cmd.AddCommand(newCmdAgentUpdate(f))
 	cmd.AddCommand(newCmdAgentDelete(f))
 	cmd.AddCommand(newCmdAgentDevices(f))
+	cmd.AddCommand(newCmdAgentDeploy(f))
+	cmd.AddCommand(newCmdAgentUndeploy(f))
 
 	return cmd
 }

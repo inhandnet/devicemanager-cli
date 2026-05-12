@@ -14,7 +14,6 @@ import (
 func NewCmdList(f *factory.Factory) *cobra.Command {
 	var (
 		parent   string
-		verbose  int
 		maxDepth int
 	)
 
@@ -29,9 +28,6 @@ func NewCmdList(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			if verbose > 0 {
-				q.Set("verbose", strconv.Itoa(verbose))
-			}
 			if maxDepth > 0 {
 				q.Set("max_depth", strconv.Itoa(maxDepth))
 			}
@@ -50,7 +46,6 @@ func NewCmdList(f *factory.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&parent, "parent", "", "Filter by parent group ID")
-	cmd.Flags().IntVar(&verbose, "verbose", 100, "Detail level (1-100)")
 	cmd.Flags().IntVar(&maxDepth, "max-depth", 3, "Max depth of group tree")
 
 	return cmd

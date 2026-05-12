@@ -3,6 +3,7 @@ package edge
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -36,7 +37,7 @@ func newCmdVersionUpload(f *factory.Factory) *cobra.Command {
 			output, _ := cmd.Flags().GetString("output")
 
 			uploadURL := fmt.Sprintf("/api/edge/apps/upload?app=%s", appID)
-			resp, err := client.Upload(uploadURL, "file", filePath, file)
+			resp, err := client.Upload(uploadURL, "file", filepath.Base(filePath), file)
 			if err != nil {
 				return err
 			}

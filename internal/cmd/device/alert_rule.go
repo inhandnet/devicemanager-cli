@@ -71,7 +71,7 @@ func newCmdAlertRuleList(f *factory.Factory) *cobra.Command {
 
 			q := url.Values{}
 			flags.ApplyTo(q)
-			q.Set("verbose", "100")
+
 			cmdutil.SetQueryParam(q, "device_name", deviceName)
 
 			output, _ := cmd.Flags().GetString("output")

@@ -85,10 +85,13 @@ devicemanager device list                                          # List device
 devicemanager device list --online 1 --model IR615                 # Filter by status/model
 devicemanager device list --name router-01 --serial-number GL5022  # Filter by name/SN
 devicemanager device list --cursor 20 --limit 50                   # Pagination: skip 20, take 50
-devicemanager device list --verbose 100 -o json                    # Full fields + JSON output
+devicemanager device list -o json                                  # JSON output (verbose=100 by default)
 
-devicemanager device get <device-id> --verbose 100                 # Device details
+devicemanager device get <device-id>                               # Device details
 devicemanager device create --name <name> --serial-number <sn>     # Add a device
+devicemanager device import devices.xlsx                           # Batch import devices from Excel
+devicemanager device import devices.xlsx --group <group-id>        # Import and assign to group
+devicemanager device import devices.xlsx --no-overwrite            # Import without overwriting existing
 devicemanager device models                                        # List supported device models
 devicemanager device stats                                         # Device overview (online/total counts)
 devicemanager device signal <device-id> --after <ISO>                 # Signal quality (from start to now)
@@ -111,6 +114,10 @@ devicemanager device count total --start-time 2026-04-01 --end-time 2026-05-01  
 # Device clients
 devicemanager device clients list <device-id>                      # List connected clients
 devicemanager device clients batch <device-id>...                  # Batch query clients
+
+# Remote web management
+devicemanager device web <device-id>                               # Start remote web management
+devicemanager device web <device-id> --port 443 --proto https      # Custom port/protocol
 
 # Device update & delete
 devicemanager device update <device-id> --name "new-name"          # Rename device
@@ -215,7 +222,7 @@ devicemanager drc delete <template-id>                             # Delete a te
 devicemanager drc devices <template-id> list                       # List assigned devices
 devicemanager drc devices <template-id> list --status running      # Filter by status
 devicemanager drc devices <template-id> add <device-id>...         # Assign devices
-devicemanager drc devices <template-id> add <device-id> --group <group-id>  # Assign device group
+devicemanager drc devices <template-id> add --group <group-id>     # Assign by device group
 devicemanager drc devices <template-id> remove <device-id>         # Remove a device
 devicemanager drc devices <template-id> restart <device-id>        # Restart device task
 ```
@@ -232,7 +239,10 @@ devicemanager edge agent upload <file-path> --description "IR615 engine"  # Uplo
 devicemanager edge agent update <agent-id> --description "new desc"       # Update engine
 devicemanager edge agent delete <agent-id>                    # Delete engine
 devicemanager edge agent devices <agent-id>                   # List deployed devices
-devicemanager edge agent devices <agent-id> --status READY    # Filter by status
+devicemanager edge agent devices <agent-id> --status READY    # Filter by status (PENDING/INSTALLING/DOWNLOADING/READY/FAILED)
+devicemanager edge agent deploy <agent-id> <device-id>...     # Deploy agent to devices
+devicemanager edge agent deploy <agent-id> --group <group-id> # Deploy agent to device group
+devicemanager edge agent undeploy <agent-id> <device-id>...   # Remove agent from devices
 ```
 
 #### Edge applications
@@ -244,6 +254,9 @@ devicemanager edge app create --name "my-app" --description "..."          # Cre
 devicemanager edge app update <app-id> --description "new desc"           # Update application
 devicemanager edge app delete <app-id>                        # Delete application
 devicemanager edge app logs <device-id> <app-name>            # View app runtime logs on device
+devicemanager edge app deploy <app-id> --version <ver> <device-id>...  # Deploy app to devices
+devicemanager edge app deploy <app-id> --version <ver> --group <id>    # Deploy app to group
+devicemanager edge app undeploy <app-id> <device-id>...       # Cancel app deployment from devices
 ```
 
 #### Application versions
@@ -266,6 +279,7 @@ devicemanager edge config create <app-id> --version v1.0 --content "..."    # Cr
 devicemanager edge config update <app-id> <config-id> --description "..."   # Update config
 devicemanager edge config delete <app-id> <config-id>         # Delete config
 devicemanager edge config deploy <app-id> <version> --device <id> --group <id>  # Deploy config
+devicemanager edge config undeploy <app-id> <device-id>...    # Cancel config deployment from devices
 ```
 
 #### Remote control
@@ -274,6 +288,13 @@ devicemanager edge config deploy <app-id> <version> --device <id> --group <id>  
 devicemanager edge control start <device-id> <app-id>         # Start application
 devicemanager edge control stop <device-id> <app-id>          # Stop application
 devicemanager edge control restart <device-id> <app-id>       # Restart application
+devicemanager edge control remove <device-id> <app-id>        # Uninstall application
+```
+
+#### Device edge status
+
+```bash
+devicemanager edge device <device-id>                         # Get edge status (agent & apps) of a device
 ```
 
 ### Task management
@@ -281,7 +302,7 @@ devicemanager edge control restart <device-id> <app-id>       # Restart applicat
 ```bash
 devicemanager task list                                            # List all tasks
 devicemanager task list --status running                           # Filter by status (running/waiting/failed/completed)
-devicemanager task list --type firmware_upgrade                    # Filter by task type
+devicemanager task list --type config-apply                        # Filter by type (config-apply/interactive-command/fetch-config/import-firmware/vpn-channel/vpn-link-order/token-cleanup/traffic-stats/idle-notice/remote-web)
 devicemanager task list --object-id <device-id>                    # Filter by device ID
 devicemanager task cancel <task-id>                                # Cancel a task
 devicemanager task restart <task-id>                               # Restart a task
@@ -293,6 +314,7 @@ devicemanager task restart <task-id>                               # Restart a t
 
 ```bash
 devicemanager system user list                                     # List users in organization
+devicemanager system user list --oid <org-id>                      # List users in a specific organization
 devicemanager system user get <user-id>                            # User details
 devicemanager system user create \
   --name "test" \
@@ -335,6 +357,8 @@ devicemanager system permission unassigned-users                   # List users 
 
 ```bash
 devicemanager system org list                                      # List organizations
+devicemanager system org list --name "InHand"                      # Filter by name
+devicemanager system org list --email "info@example.com"           # Filter by email
 devicemanager system org get                                       # View current org info
 devicemanager system org update <org-id> --name "New Org Name"     # Update org name
 devicemanager system org update <org-id> --email "org@example.com" # Update org email
@@ -361,14 +385,17 @@ devicemanager firmware create \
   --name "IR615-v2.0" \
   --version 2.0.0 \
   --model IR615             # Create firmware record
-devicemanager firmware upgrade <device-id> --firmware-id <id>    # Upgrade a single device
+devicemanager firmware delete <firmware-id>                      # Delete a firmware
+devicemanager firmware upgrade <device-id> --firmware-id <id>    # Upgrade a single device (timeout default 600s)
 
 # Batch upgrade management
 devicemanager firmware devices <firmware-id> list                # List devices in upgrade task
 devicemanager firmware devices <firmware-id> add <device-id>...  # Add devices for batch upgrade
-devicemanager firmware devices <firmware-id> add --group <group-id>...  # Upgrade by group
-devicemanager firmware devices <firmware-id> remove <device-id>  # Cancel device upgrade
+devicemanager firmware devices <firmware-id> add --group <group-id>  # Upgrade by device group
+devicemanager firmware devices <firmware-id> remove <device-id>  # Remove device from upgrade
 devicemanager firmware job-stats <job-id>                        # Upgrade job statistics
+devicemanager firmware cancel <job-id> <device-id>               # Cancel upgrade for a device
+devicemanager firmware retry <job-id> <device-id>                # Retry upgrade for a device
 ```
 
 ### Device model documentation
@@ -397,6 +424,7 @@ devicemanager device list --debug -o json 2>/tmp/debug.log     # Write debug to 
 ```bash
 devicemanager --context prod auth status            # Temporarily switch context
 devicemanager --debug device list                   # Enable debug output
+devicemanager --verbose 50 device list              # Reduce response detail level
 devicemanager --jq '.[].name' device list           # Filter JSON with jq expression
 devicemanager version                                # Show version info
 ```
@@ -421,12 +449,11 @@ The `{"result": ...}` envelope from the server is automatically unwrapped in yam
 
 ### Field verbosity (`--verbose`)
 
-The DM API uses a `verbose` parameter to control how many fields are returned (1-100, higher = more detailed):
+The DM API uses a `verbose` parameter to control how many fields are returned (1-100, higher = more detailed). The CLI provides a global `--verbose` flag (default 100) that is automatically applied to all GET (query) requests. POST/PUT/DELETE requests are not affected.
 
 ```bash
-devicemanager device list --verbose 10                # Default list fields
-devicemanager device list --verbose 100 -o json       # All fields
-devicemanager device get <id> --verbose 100           # Full device details
+devicemanager device list                            # verbose=100 by default (all fields)
+devicemanager --verbose 15 device list               # Minimal fields
 ```
 
 ### Pagination
@@ -492,7 +519,7 @@ internal/
     docs/           # Device model reference documentation (from GitHub)
     system/         # System management (users, roles, permissions, org, audit logs)
     version/        # Version info
-  cmdutil/          # Shared list flags (cursor/limit/verbose), query builder
+  cmdutil/          # Shared list flags (cursor/limit), query builder
   config/           # Config file I/O, context model
   debug/            # Debug output (--debug / DEVICEMANAGER_DEBUG)
   factory/          # Dependency injection factory

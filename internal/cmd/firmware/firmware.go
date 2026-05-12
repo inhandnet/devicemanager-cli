@@ -15,10 +15,13 @@ func NewCmdFirmware(f *factory.Factory) *cobra.Command {
 	cmd.AddCommand(NewCmdList(f))
 	cmd.AddCommand(NewCmdGet(f))
 	cmd.AddCommand(NewCmdCreate(f))
+	cmd.AddCommand(NewCmdDelete(f))
 	cmd.AddCommand(NewCmdUpload(f))
 	cmd.AddCommand(NewCmdUpgrade(f))
 	cmd.AddCommand(NewCmdDevices(f))
 	cmd.AddCommand(NewCmdJobStats(f))
+	cmd.AddCommand(NewCmdCancel(f))
+	cmd.AddCommand(NewCmdRetry(f))
 
 	return cmd
 }

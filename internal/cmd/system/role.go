@@ -32,8 +32,6 @@ func newCmdRoleList(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			q.Set("verbose", "100")
-
 			output, _ := cmd.Flags().GetString("output")
 
 			body, err := client.Get("/api2/roles", q)

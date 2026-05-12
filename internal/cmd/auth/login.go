@@ -163,9 +163,8 @@ func fetchCurrentUser(ctx *config.Context) (string, string) {
 		Token: ctx.Token,
 		Base:  http.DefaultTransport,
 	}
-	client := api.NewAPIClient(ctx.APIURL(), transport)
+	client := api.NewAPIClient(ctx.APIURL(), transport, 100)
 	q := url.Values{}
-	q.Set("verbose", "100")
 	body, err := client.Get("/api/users/this", q)
 	if err != nil {
 		return "", ""

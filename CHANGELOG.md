@@ -1,3 +1,45 @@
+# v0.5.5 (2026-05-12)
+
+## New Features
+
+### Device Management
+- Add `device import` command — batch import devices from Excel file (upload + batch_add in one step), supports `--group` and `--no-overwrite`
+- Add `device web` command — start remote web management session for a device via ngrok, supports `--proto`, `--port`, `--server`
+
+### Edge Computing
+- Add `edge agent deploy` / `edge agent undeploy` — deploy/remove agent to/from devices or device groups
+- Add `edge app deploy` / `edge app undeploy` — deploy/cancel app deployment to devices or device groups
+- Add `edge config undeploy` — cancel config deployment from devices
+- Add `edge control remove` — uninstall an edge app from a device
+- Add `edge device` command — query edge status (agent & apps) of a single device
+
+### Firmware Management
+- Add `firmware delete` command — delete a firmware record
+- Add `firmware cancel` command — cancel an upgrade task for a device
+- Add `firmware retry` command — retry a failed upgrade task for a device
+
+### System Management
+- `system user list` — add `--oid` flag to list users in a specific organization
+- `system org list` — add `--name` and `--email` filter flags
+
+## Bug Fixes
+
+- **drc devices add**: Fix `MinimumNArgs(2)` preventing group-only assignment; now accepts `--group` without device IDs
+- **firmware devices add**: Same fix as above — `--group` now works without device IDs
+- **edge agent upload / version upload**: Fix `filename` containing full path (e.g. `C:\Users\...\agent.tar.gz`); now sends only the base filename via `filepath.Base()`
+- **edge agent devices**: Add missing `PENDING` status to `--status` help text
+- **firmware upgrade**: Make `--timeout` required (default 600s), remove unused `--device-name` flag, use `MarkFlagRequired` for `--firmware-id`
+- **task list --type**: Fix help text showing invalid `firmware_upgrade`; now lists all valid types (`config-apply`, `interactive-command`, etc.) with proper mapping to API numeric values
+- **task list --status**: Fix help text showing invalid values; now maps `running`→`1`, `waiting`→`0,4,5`, `failed`→`-1,2`, `completed`→`3`
+- **permission unassigned-users**: Filter out admin users from results (matching frontend behavior)
+
+## Improvements
+
+- **verbose**: Add global `--verbose` flag (default 100), only injected into GET requests; POST/PUT/DELETE not affected. Remove per-command verbose boilerplate
+- **limit=0**: `permission list`, `permission users list`, `permission unassigned-users`, `system user list`, `device models` now use `limit=0` to return all results (matching frontend behavior)
+
+---
+
 # v0.5.4 (2026-05-09)
 
 ## New Features

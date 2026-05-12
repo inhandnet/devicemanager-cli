@@ -1,6 +1,7 @@
 package system
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -33,9 +34,7 @@ func NewCmdPermission(f *factory.Factory) *cobra.Command {
 }
 
 func newCmdPermissionList(f *factory.Factory) *cobra.Command {
-	var flags cmdutil.ListFlags
-
-	cmd := &cobra.Command{
+	return &cobra.Command{
 		Use:     "list",
 		Short:   "List device permission groups",
 		Aliases: []string{"ls"},
@@ -46,8 +45,7 @@ func newCmdPermissionList(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			flags.ApplyTo(q)
-			q.Set("verbose", "100")
+			q.Set("limit", "0")
 
 			output, _ := cmd.Flags().GetString("output")
 
@@ -60,10 +58,6 @@ func newCmdPermissionList(f *factory.Factory) *cobra.Command {
 				iostreams.WithColumns("_id", "name", "description", "deviceCount"))
 		},
 	}
-
-	flags.Register(cmd)
-
-	return cmd
 }
 
 func newCmdPermissionGet(f *factory.Factory) *cobra.Command {
@@ -219,9 +213,7 @@ func newCmdPermissionUsers(f *factory.Factory) *cobra.Command {
 }
 
 func newCmdPermissionUsersList(f *factory.Factory) *cobra.Command {
-	var flags cmdutil.ListFlags
-
-	cmd := &cobra.Command{
+	return &cobra.Command{
 		Use:     "list <group-id>",
 		Short:   "List users in a permission group",
 		Aliases: []string{"ls"},
@@ -233,8 +225,7 @@ func newCmdPermissionUsersList(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			flags.ApplyTo(q)
-			q.Set("verbose", "100")
+			q.Set("limit", "0")
 
 			output, _ := cmd.Flags().GetString("output")
 
@@ -247,10 +238,6 @@ func newCmdPermissionUsersList(f *factory.Factory) *cobra.Command {
 				iostreams.WithColumns("_id", "name", "email", "roleName"))
 		},
 	}
-
-	flags.Register(cmd)
-
-	return cmd
 }
 
 func newCmdPermissionUsersAdd(f *factory.Factory) *cobra.Command {
@@ -336,7 +323,7 @@ func newCmdPermissionDevicesList(f *factory.Factory) *cobra.Command {
 
 			q := url.Values{}
 			flags.ApplyTo(q)
-			q.Set("verbose", "100")
+
 
 			output, _ := cmd.Flags().GetString("output")
 
@@ -511,8 +498,6 @@ func newCmdPermissionDeviceGroupsRemove(f *factory.Factory) *cobra.Command {
 }
 
 func newCmdPermissionUnassignedUsers(f *factory.Factory) *cobra.Command {
-	var flags cmdutil.ListFlags
-
 	cmd := &cobra.Command{
 		Use:   "unassigned-users",
 		Short: "List users not assigned to any permission group",
@@ -523,11 +508,16 @@ func newCmdPermissionUnassignedUsers(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			flags.ApplyTo(q)
+			q.Set("limit", "0")
 
 			output, _ := cmd.Flags().GetString("output")
 
 			body, err := client.Get("/api/groups/none/users", q)
+			if err != nil {
+				return err
+			}
+
+			body, err = filterNonAdminUsers(body)
 			if err != nil {
 				return err
 			}
@@ -537,7 +527,37 @@ func newCmdPermissionUnassignedUsers(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	flags.Register(cmd)
-
 	return cmd
+}
+
+func filterNonAdminUsers(body []byte) ([]byte, error) {
+	var resp map[string]json.RawMessage
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return body, nil
+	}
+
+	raw, ok := resp["result"]
+	if !ok {
+		return body, nil
+	}
+
+	var users []map[string]any
+	if err := json.Unmarshal(raw, &users); err != nil {
+		return body, nil
+	}
+
+	filtered := make([]map[string]any, 0, len(users))
+	for _, u := range users {
+		if roleName, _ := u["roleName"].(string); roleName != "admin" {
+			filtered = append(filtered, u)
+		}
+	}
+
+	rawFiltered, err := json.Marshal(filtered)
+	if err != nil {
+		return body, err
+	}
+	resp["result"] = rawFiltered
+
+	return json.Marshal(resp)
 }

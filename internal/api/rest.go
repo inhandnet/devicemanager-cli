@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -22,18 +23,25 @@ func (e *HTTPError) Error() string {
 }
 
 type APIClient struct {
-	inner *resty.Client
+	inner   *resty.Client
+	Verbose int
 }
 
-func NewAPIClient(baseURL string, transport http.RoundTripper) *APIClient {
+func NewAPIClient(baseURL string, transport http.RoundTripper, verbose int) *APIClient {
 	c := resty.New()
 	c.SetBaseURL(baseURL)
 	c.SetTransport(transport)
-	return &APIClient{inner: c}
+	return &APIClient{inner: c, Verbose: verbose}
 }
 
 func (c *APIClient) Get(path string, query url.Values) ([]byte, error) {
 	r := c.inner.R()
+	if query == nil {
+		query = url.Values{}
+	}
+	if query.Get("verbose") == "" && c.Verbose > 0 {
+		query.Set("verbose", strconv.Itoa(c.Verbose))
+	}
 	if clean := cleanValues(query); len(clean) > 0 {
 		r.SetQueryParamsFromValues(clean)
 	}

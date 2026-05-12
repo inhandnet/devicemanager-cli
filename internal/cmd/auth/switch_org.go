@@ -3,7 +3,6 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -41,7 +40,7 @@ func NewCmdSwitchOrg(f *factory.Factory) *cobra.Command {
 			}
 
 			// Get current user ID
-			userBody, err := client.Get("/api2/users/this", url.Values{"verbose": {"50"}})
+			userBody, err := client.Get("/api2/users/this", nil)
 			if err != nil {
 				return fmt.Errorf("getting current user: %w", err)
 			}
@@ -114,7 +113,7 @@ func NewCmdOrgs(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			userBody, err := client.Get("/api2/users/this", url.Values{"verbose": {"50"}})
+			userBody, err := client.Get("/api2/users/this", nil)
 			if err != nil {
 				return fmt.Errorf("getting current user: %w", err)
 			}

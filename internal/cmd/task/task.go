@@ -12,6 +12,26 @@ import (
 	"github.com/inhandnet/devicemanager-cli/internal/ui"
 )
 
+var statusMap = map[string]string{
+	"running":   "1",
+	"waiting":   "0,4,5",
+	"failed":    "-1,2",
+	"completed": "3",
+}
+
+var typeMap = map[string]string{
+	"config-apply":        "1",
+	"interactive-command": "2",
+	"fetch-config":        "4",
+	"import-firmware":     "6",
+	"vpn-channel":         "12",
+	"vpn-link-order":      "13",
+	"token-cleanup":       "15",
+	"traffic-stats":       "18",
+	"idle-notice":         "20",
+	"remote-web":          "23",
+}
+
 func NewCmdTask(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "task",
@@ -39,14 +59,21 @@ func newCmdTaskList(f *factory.Factory) *cobra.Command {
 		Use:     "list",
 		Short:   "List tasks",
 		Aliases: []string{"ls"},
-		Example: `  # List all running tasks
+		Example: `  # List running tasks
   devicemanager task list --status running
+
+  # List waiting tasks
+  devicemanager task list --status waiting
 
   # List failed tasks
   devicemanager task list --status failed
 
+  # List completed tasks
+  devicemanager task list --status completed
+
   # Filter by type
-  devicemanager task list --type firmware_upgrade`,
+  devicemanager task list --type config-apply
+  devicemanager task list --type interactive-command`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := f.APIClient()
 			if err != nil {
@@ -55,9 +82,23 @@ func newCmdTaskList(f *factory.Factory) *cobra.Command {
 
 			q := url.Values{}
 			opts.ApplyTo(q)
-			q.Set("verbose", "50")
-			cmdutil.SetQueryParam(q, "states", opts.Status)
-			cmdutil.SetQueryParam(q, "types", opts.TaskType)
+
+			if opts.Status != "" {
+				states, ok := statusMap[opts.Status]
+				if !ok {
+					return fmt.Errorf("invalid status %q, valid values: running, waiting, failed, completed", opts.Status)
+				}
+				q.Set("states", states)
+			}
+
+			if opts.TaskType != "" {
+				typeVal, ok := typeMap[opts.TaskType]
+				if !ok {
+					return fmt.Errorf("invalid type %q, valid values: config-apply, interactive-command, fetch-config, import-firmware, vpn-channel, vpn-link-order, token-cleanup, traffic-stats, idle-notice, remote-web", opts.TaskType)
+				}
+				q.Set("types", typeVal)
+			}
+
 			cmdutil.SetQueryParam(q, "object_id", opts.ObjectID)
 
 			output, _ := cmd.Flags().GetString("output")
@@ -74,8 +115,8 @@ func newCmdTaskList(f *factory.Factory) *cobra.Command {
 	}
 
 	opts.Register(cmd)
-	cmd.Flags().StringVar(&opts.Status, "status", "", "Filter by status (running/waiting/failed/completed)")
-	cmd.Flags().StringVar(&opts.TaskType, "type", "", "Filter by task type")
+	cmd.Flags().StringVar(&opts.Status, "status", "", "Filter by status: running, waiting, failed, completed")
+	cmd.Flags().StringVar(&opts.TaskType, "type", "", "Filter by type: config-apply, interactive-command, fetch-config, import-firmware, vpn-channel, vpn-link-order, token-cleanup, traffic-stats, idle-notice, remote-web")
 	cmd.Flags().StringVar(&opts.ObjectID, "object-id", "", "Filter by device ID")
 
 	return cmd

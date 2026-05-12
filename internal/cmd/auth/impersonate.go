@@ -163,7 +163,6 @@ func NewCmdImpersonate(f *factory.Factory) *cobra.Command {
 func resolveUserForOrg(client *api.APIClient, oid string) (string, error) {
 	q := url.Values{}
 	q.Set("oid", oid)
-	q.Set("verbose", "100")
 	q.Set("limit", "0")
 
 	body, err := client.Get("/api2/users", q)

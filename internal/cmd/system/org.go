@@ -24,7 +24,7 @@ func NewCmdOrg(f *factory.Factory) *cobra.Command {
 }
 
 func newCmdOrgList(f *factory.Factory) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "list",
 		Short:   "List organizations",
 		Aliases: []string{"ls"},
@@ -35,7 +35,14 @@ func newCmdOrgList(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			q.Set("verbose", "100")
+
+
+			if name, _ := cmd.Flags().GetString("name"); name != "" {
+				q.Set("name", name)
+			}
+			if email, _ := cmd.Flags().GetString("email"); email != "" {
+				q.Set("email", email)
+			}
 
 			output, _ := cmd.Flags().GetString("output")
 
@@ -48,6 +55,11 @@ func newCmdOrgList(f *factory.Factory) *cobra.Command {
 				iostreams.WithColumns("_id", "name", "email"))
 		},
 	}
+
+	cmd.Flags().String("name", "", "Filter by organization name")
+	cmd.Flags().String("email", "", "Filter by email")
+
+	return cmd
 }
 
 func newCmdOrgGet(f *factory.Factory) *cobra.Command {
@@ -61,7 +73,7 @@ func newCmdOrgGet(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-			q.Set("verbose", "100")
+
 
 			output, _ := cmd.Flags().GetString("output")
 

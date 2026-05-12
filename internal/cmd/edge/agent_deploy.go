@@ -1,4 +1,4 @@
-package firmware
+package edge
 
 import (
 	"fmt"
@@ -9,13 +9,13 @@ import (
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
-func NewCmdDevicesAdd(f *factory.Factory) *cobra.Command {
+func newCmdAgentDeploy(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "add <firmware-id> [device-id]...",
-		Short: "Batch upgrade devices with a firmware",
+		Use:   "deploy <agent-id> [device-id]...",
+		Short: "Deploy an edge agent to devices or device groups",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			firmwareID := args[0]
+			agentID := args[0]
 			deviceIDs := args[1:]
 			groupIDs, _ := cmd.Flags().GetStringSlice("group")
 
@@ -38,24 +38,23 @@ func NewCmdDevicesAdd(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Post(fmt.Sprintf("/api/firmware/%s/devices", firmwareID), body)
+			resp, err := client.Post(fmt.Sprintf("/api/edge/agents/%s/deploy", agentID), body)
 			if err != nil {
 				return err
 			}
 
 			switch {
 			case len(deviceIDs) > 0 && len(groupIDs) > 0:
-				fmt.Fprintf(f.IO.Out, "Added %d device(s) and %d group(s) to firmware upgrade %s\n", len(deviceIDs), len(groupIDs), firmwareID)
+				fmt.Fprintf(f.IO.Out, "Deployed agent %s to %d device(s) and %d group(s)\n", agentID, len(deviceIDs), len(groupIDs))
 			case len(groupIDs) > 0:
-				fmt.Fprintf(f.IO.Out, "Added %d group(s) to firmware upgrade %s\n", len(groupIDs), firmwareID)
+				fmt.Fprintf(f.IO.Out, "Deployed agent %s to %d group(s)\n", agentID, len(groupIDs))
 			default:
-				fmt.Fprintf(f.IO.Out, "Added %d device(s) to firmware upgrade %s\n", len(deviceIDs), firmwareID)
+				fmt.Fprintf(f.IO.Out, "Deployed agent %s to %d device(s)\n", agentID, len(deviceIDs))
 			}
 			return iostreams.FormatOutput(resp, f.IO, output)
 		},
 	}
 
-	cmd.Flags().StringSlice("group", nil, "Device group IDs to upgrade")
-
+	cmd.Flags().StringSlice("group", nil, "Device group IDs to deploy to")
 	return cmd
 }

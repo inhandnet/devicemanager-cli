@@ -23,21 +23,11 @@ func NewCmdUpgrade(f *factory.Factory) *cobra.Command {
 
 			deviceID := args[0]
 			firmwareID, _ := cmd.Flags().GetString("firmware-id")
-			deviceName, _ := cmd.Flags().GetString("device-name")
 			timeout, _ := cmd.Flags().GetInt("timeout")
 
-			if firmwareID == "" {
-				return fmt.Errorf("--firmware-id is required")
-			}
-
-			body := map[string]interface{}{
+			body := map[string]any{
 				"firmwareId": firmwareID,
-			}
-			if deviceName != "" {
-				body["deviceName"] = deviceName
-			}
-			if timeout > 0 {
-				body["timeout"] = timeout
+				"timeout":    timeout,
 			}
 
 			output, _ := cmd.Flags().GetString("output")
@@ -53,8 +43,8 @@ func NewCmdUpgrade(f *factory.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().String("firmware-id", "", "Firmware ID (required)")
-	cmd.Flags().String("device-name", "", "Device name")
-	cmd.Flags().Int("timeout", 0, "Upgrade timeout (seconds)")
+	_ = cmd.MarkFlagRequired("firmware-id")
+	cmd.Flags().Int("timeout", 600, "Upgrade timeout in seconds (required)")
 
 	return cmd
 }

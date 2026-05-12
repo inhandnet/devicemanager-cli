@@ -14,6 +14,7 @@ import (
 type Factory struct {
 	IO         *iostreams.IOStreams
 	ConfigPath string
+	Verbose    int
 
 	configOnce sync.Once
 	config     *config.Config
@@ -24,6 +25,7 @@ func New() *Factory {
 	return &Factory{
 		IO:         iostreams.System(),
 		ConfigPath: config.DefaultPath(),
+		Verbose:    100,
 	}
 }
 
@@ -53,7 +55,7 @@ func (f *Factory) APIClient() (*api.APIClient, error) {
 		return nil, err
 	}
 	f.debugConfig(actx)
-	return api.NewAPIClient(actx.APIURL(), f.newTransport(actx)), nil
+	return api.NewAPIClient(actx.APIURL(), f.newTransport(actx), f.Verbose), nil
 }
 
 func (f *Factory) activeContext() (*config.Context, error) {

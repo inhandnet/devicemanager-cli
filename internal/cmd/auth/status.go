@@ -90,9 +90,7 @@ func NewCmdStatus(f *factory.Factory) *cobra.Command {
 				}
 
 				// Get current user
-				q := url.Values{}
-				q.Set("verbose", "50")
-				body, err := client.Get("/api/users/this", q)
+				body, err := client.Get("/api/users/this", nil)
 				if err == nil {
 					var resp struct {
 						Result struct {

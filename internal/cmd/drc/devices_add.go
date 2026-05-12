@@ -11,23 +11,27 @@ import (
 
 func NewCmdDevicesAdd(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "add <template-id> <device-id>...",
-		Short: "Assign devices to a DRC template",
-		Args:  cobra.MinimumNArgs(2),
+		Use:   "add <template-id> [device-id]...",
+		Short: "Assign devices or device groups to a DRC template",
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			templateID := args[0]
+			deviceIDs := args[1:]
+			groupIDs, _ := cmd.Flags().GetStringSlice("group")
+
+			if len(deviceIDs) == 0 && len(groupIDs) == 0 {
+				return fmt.Errorf("must specify at least one device ID or --group")
+			}
+
 			client, err := f.APIClient()
 			if err != nil {
 				return err
 			}
 
-			templateID := args[0]
-			deviceIDs := args[1:]
-
-			body := map[string]interface{}{
-				"deviceIds": deviceIDs,
+			body := map[string]any{}
+			if len(deviceIDs) > 0 {
+				body["deviceIds"] = deviceIDs
 			}
-
-			groupIDs, _ := cmd.Flags().GetStringSlice("group")
 			if len(groupIDs) > 0 {
 				body["deviceGroupIds"] = groupIDs
 			}
@@ -39,7 +43,14 @@ func NewCmdDevicesAdd(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			fmt.Fprintf(f.IO.Out, "Assigned %d device(s) to template %s\n", len(deviceIDs), templateID)
+			switch {
+			case len(deviceIDs) > 0 && len(groupIDs) > 0:
+				fmt.Fprintf(f.IO.Out, "Assigned %d device(s) and %d group(s) to template %s\n", len(deviceIDs), len(groupIDs), templateID)
+			case len(groupIDs) > 0:
+				fmt.Fprintf(f.IO.Out, "Assigned %d group(s) to template %s\n", len(groupIDs), templateID)
+			default:
+				fmt.Fprintf(f.IO.Out, "Assigned %d device(s) to template %s\n", len(deviceIDs), templateID)
+			}
 			return iostreams.FormatOutput(resp, f.IO, output)
 		},
 	}

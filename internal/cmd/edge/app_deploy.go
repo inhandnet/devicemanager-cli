@@ -1,4 +1,4 @@
-package firmware
+package edge
 
 import (
 	"fmt"
@@ -9,16 +9,20 @@ import (
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
-func NewCmdDevicesAdd(f *factory.Factory) *cobra.Command {
+func newCmdAppDeploy(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "add <firmware-id> [device-id]...",
-		Short: "Batch upgrade devices with a firmware",
+		Use:   "deploy <app-id> --version <version> [device-id]...",
+		Short: "Deploy an edge app version to devices or device groups",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			firmwareID := args[0]
+			appID := args[0]
 			deviceIDs := args[1:]
 			groupIDs, _ := cmd.Flags().GetStringSlice("group")
+			version, _ := cmd.Flags().GetString("version")
 
+			if version == "" {
+				return fmt.Errorf("--version is required")
+			}
 			if len(deviceIDs) == 0 && len(groupIDs) == 0 {
 				return fmt.Errorf("must specify at least one device ID or --group")
 			}
@@ -38,24 +42,25 @@ func NewCmdDevicesAdd(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Post(fmt.Sprintf("/api/firmware/%s/devices", firmwareID), body)
+			resp, err := client.Post(fmt.Sprintf("/api/edge/apps/%s/versions/%s/deploy", appID, version), body)
 			if err != nil {
 				return err
 			}
 
 			switch {
 			case len(deviceIDs) > 0 && len(groupIDs) > 0:
-				fmt.Fprintf(f.IO.Out, "Added %d device(s) and %d group(s) to firmware upgrade %s\n", len(deviceIDs), len(groupIDs), firmwareID)
+				fmt.Fprintf(f.IO.Out, "Deployed app %s (version %s) to %d device(s) and %d group(s)\n", appID, version, len(deviceIDs), len(groupIDs))
 			case len(groupIDs) > 0:
-				fmt.Fprintf(f.IO.Out, "Added %d group(s) to firmware upgrade %s\n", len(groupIDs), firmwareID)
+				fmt.Fprintf(f.IO.Out, "Deployed app %s (version %s) to %d group(s)\n", appID, version, len(groupIDs))
 			default:
-				fmt.Fprintf(f.IO.Out, "Added %d device(s) to firmware upgrade %s\n", len(deviceIDs), firmwareID)
+				fmt.Fprintf(f.IO.Out, "Deployed app %s (version %s) to %d device(s)\n", appID, version, len(deviceIDs))
 			}
 			return iostreams.FormatOutput(resp, f.IO, output)
 		},
 	}
 
-	cmd.Flags().StringSlice("group", nil, "Device group IDs to upgrade")
-
+	cmd.Flags().String("version", "", "App version to deploy (required)")
+	cmd.Flags().StringSlice("group", nil, "Device group IDs to deploy to")
+	_ = cmd.MarkFlagRequired("version")
 	return cmd
 }

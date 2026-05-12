@@ -17,6 +17,7 @@ func NewCmdEdge(f *factory.Factory) *cobra.Command {
 	cmd.AddCommand(newCmdVersion(f))
 	cmd.AddCommand(newCmdConfig(f))
 	cmd.AddCommand(newCmdControl(f))
+	cmd.AddCommand(newCmdDevice(f))
 
 	return cmd
 }

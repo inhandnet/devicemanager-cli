@@ -23,6 +23,7 @@ func NewCmdRoot(f *factory.Factory) *cobra.Command {
 	cmd.PersistentFlags().String("jq", "", `Filter JSON output using a jq expression (implies -o json)`)
 	cmd.PersistentFlags().String("context", "", "Override active context (env: DEVICEMANAGER_CONTEXT)")
 	cmd.PersistentFlags().Bool("debug", false, "Enable debug output (env: DEVICEMANAGER_DEBUG)")
+	cmd.PersistentFlags().Int("verbose", 100, "API response detail level (1-100, higher = more fields)")
 
 	cmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 		if d, _ := cmd.Flags().GetBool("debug"); d {
@@ -47,6 +48,10 @@ func NewCmdRoot(f *factory.Factory) *cobra.Command {
 			} else {
 				_ = cmd.Flags().Set("output", "json")
 			}
+		}
+
+		if v, _ := cmd.Flags().GetInt("verbose"); v > 0 {
+			f.Verbose = v
 		}
 
 		if ctx, _ := cmd.Flags().GetString("context"); ctx != "" {
