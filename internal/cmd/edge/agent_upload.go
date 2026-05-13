@@ -2,6 +2,7 @@ package edge
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -33,10 +34,12 @@ func newCmdAgentUpload(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			uploadURL := "/api/edge/agents/upload"
+			q := url.Values{}
+			q.Set("access_token", f.Token())
 			if desc != "" {
-				uploadURL = fmt.Sprintf("%s?description=%s", uploadURL, desc)
+				q.Set("description", desc)
 			}
+			uploadURL := fmt.Sprintf("/api/edge/agents/upload?%s", q.Encode())
 			resp, err := client.Upload(uploadURL, "file", filepath.Base(filePath), file)
 			if err != nil {
 				return err

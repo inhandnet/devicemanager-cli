@@ -19,6 +19,7 @@ type Context struct {
 	AdminToken        string    `yaml:"admin_token,omitempty"`
 	AdminRefreshToken string    `yaml:"admin_refresh_token,omitempty"`
 	AdminExpiresAt    time.Time `yaml:"admin_expires_at,omitempty"`
+	OrgID             string    `yaml:"org_id,omitempty"`
 }
 
 // IsImpersonating returns true if currently impersonating another user.

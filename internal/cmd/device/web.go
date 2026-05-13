@@ -2,12 +2,12 @@ package device
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/tidwall/gjson"
 
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
-	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 func NewCmdWeb(f *factory.Factory) *cobra.Command {
@@ -44,29 +44,54 @@ func NewCmdWeb(f *factory.Factory) *cobra.Command {
 				},
 			}
 
-			output, _ := cmd.Flags().GetString("output")
-
 			fmt.Fprintf(f.IO.Out, "Starting remote web management for device %s...\n", deviceID)
 			resp, err := client.Post("/api2/tasks/run", body)
 			if err != nil {
 				return err
 			}
 
-			state := gjson.GetBytes(resp, "result.state").Int()
-			if state == 3 {
-				url := gjson.GetBytes(resp, "result.data.response").String()
-				if url != "" {
-					fmt.Fprintf(f.IO.Out, "Remote web URL: %s\n", url)
-					return nil
+			taskID := gjson.GetBytes(resp, "result._id").String()
+			if taskID == "" {
+				return fmt.Errorf("failed to get task ID from response")
+			}
+
+			const (
+				pollInterval = 2 * time.Second
+				pollTimeout  = 30 * time.Second
+			)
+			deadline := time.Now().Add(pollTimeout)
+
+			for {
+				state := gjson.GetBytes(resp, "result.state").Int()
+
+				switch {
+				case state == 3: // completed
+					url := gjson.GetBytes(resp, "result.data.response").String()
+					if url != "" {
+						fmt.Fprintf(f.IO.Out, "Remote web URL: %s\n", url)
+						return nil
+					}
+					return fmt.Errorf("task completed but no URL returned")
+
+				case state == -1 || state == 2: // failed
+					errMsg := gjson.GetBytes(resp, "result.error").String()
+					if errMsg != "" {
+						return fmt.Errorf("task failed: %s", errMsg)
+					}
+					return fmt.Errorf("task failed (state=%d)", state)
+				}
+
+				if time.Now().After(deadline) {
+					return fmt.Errorf("timeout waiting for task to complete (task ID: %s)", taskID)
+				}
+
+				time.Sleep(pollInterval)
+
+				resp, err = client.Get(fmt.Sprintf("/api2/tasks/%s", taskID), nil)
+				if err != nil {
+					return fmt.Errorf("polling task status: %w", err)
 				}
 			}
-
-			errMsg := gjson.GetBytes(resp, "result.error").String()
-			if errMsg != "" {
-				return fmt.Errorf("task failed: %s", errMsg)
-			}
-
-			return iostreams.FormatOutput(resp, f.IO, output)
 		},
 	}
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/inhandnet/devicemanager-cli/internal/api"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 	"github.com/inhandnet/devicemanager-cli/internal/ui"
@@ -29,7 +30,9 @@ func NewCmdDelete(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Delete(fmt.Sprintf("/api/drc/%s", args[0]))
+			resp, err := client.Do("DELETE", fmt.Sprintf("/api/drc/%s", args[0]), &api.RequestOptions{
+				Query: oidQuery(f),
+			})
 			if err != nil {
 				return err
 			}

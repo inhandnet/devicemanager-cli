@@ -22,7 +22,7 @@ func NewCmdGet(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			body, err := client.Get(fmt.Sprintf("/api/drc/%s", args[0]), nil)
+			body, err := client.Get(fmt.Sprintf("/api/drc/%s", args[0]), oidQuery(f))
 			if err != nil {
 				return err
 			}

@@ -49,6 +49,24 @@ func (f *Factory) SaveConfig() error {
 	return config.Save(f.config, f.ConfigPath)
 }
 
+// Token returns the current effective access token.
+func (f *Factory) Token() string {
+	actx, err := f.activeContext()
+	if err != nil {
+		return ""
+	}
+	return actx.EffectiveToken()
+}
+
+// OrgID returns the impersonated org ID, or empty if not impersonating.
+func (f *Factory) OrgID() string {
+	actx, err := f.activeContext()
+	if err != nil {
+		return ""
+	}
+	return actx.OrgID
+}
+
 func (f *Factory) APIClient() (*api.APIClient, error) {
 	actx, err := f.activeContext()
 	if err != nil {

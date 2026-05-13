@@ -2,12 +2,14 @@ package device
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/tidwall/gjson"
 
+	"github.com/inhandnet/devicemanager-cli/internal/cmdutil"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
@@ -40,7 +42,11 @@ func NewCmdImport(f *factory.Factory) *cobra.Command {
 
 			// Step 1: upload file
 			fmt.Fprintf(f.IO.Out, "Uploading %s...\n", filepath.Base(filePath))
-			uploadResp, err := client.UploadWithFields("/api/file/form", "file", filepath.Base(filePath), file, map[string]string{
+			q := url.Values{}
+			q.Set("access_token", f.Token())
+			cmdutil.SetQueryParam(q, "oid", f.OrgID())
+			uploadURL := fmt.Sprintf("/api/file/form?%s", q.Encode())
+			uploadResp, err := client.UploadWithFields(uploadURL, "file", filepath.Base(filePath), file, map[string]string{
 				"filename": filepath.Base(filePath),
 			})
 			if err != nil {

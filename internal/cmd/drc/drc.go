@@ -1,10 +1,20 @@
 package drc
 
 import (
+	"net/url"
+
 	"github.com/spf13/cobra"
 
+	"github.com/inhandnet/devicemanager-cli/internal/cmdutil"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 )
+
+// oidQuery returns a url.Values with the org ID set if impersonating.
+func oidQuery(f *factory.Factory) url.Values {
+	q := url.Values{}
+	cmdutil.SetQueryParam(q, "oid", f.OrgID())
+	return q
+}
 
 func NewCmdDRC(f *factory.Factory) *cobra.Command {
 	cmd := &cobra.Command{

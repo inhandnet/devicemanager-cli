@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/inhandnet/devicemanager-cli/internal/api"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
@@ -28,17 +29,17 @@ func NewCmdDevicesAdd(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			body := map[string]any{}
-			if len(deviceIDs) > 0 {
-				body["deviceIds"] = deviceIDs
-			}
-			if len(groupIDs) > 0 {
-				body["deviceGroupIds"] = groupIDs
+			body := map[string]any{
+				"deviceIds":      deviceIDs,
+				"deviceGroupIds": groupIDs,
 			}
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Post(fmt.Sprintf("/api/drc/%s/devices", templateID), body)
+			resp, err := client.Do("POST", fmt.Sprintf("/api/drc/%s/devices", templateID), &api.RequestOptions{
+				Query: oidQuery(f),
+				Body:  body,
+			})
 			if err != nil {
 				return err
 			}

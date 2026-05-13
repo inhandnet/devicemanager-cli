@@ -1,8 +1,6 @@
 package drc
 
 import (
-	"net/url"
-
 	"github.com/spf13/cobra"
 
 	"github.com/inhandnet/devicemanager-cli/internal/cmdutil"
@@ -29,7 +27,7 @@ func NewCmdList(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			q := url.Values{}
+			q := oidQuery(f)
 			opts.ApplyTo(q)
 			cmdutil.SetQueryParam(q, "name", opts.Name)
 			cmdutil.SetQueryParam(q, "model", opts.Model)

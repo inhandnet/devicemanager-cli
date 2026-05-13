@@ -54,6 +54,7 @@ func NewCmdImpersonate(f *factory.Factory) *cobra.Command {
 				ctx.AdminToken = ""
 				ctx.AdminRefreshToken = ""
 				ctx.AdminExpiresAt = time.Time{}
+				ctx.OrgID = ""
 				if err := f.SaveConfig(); err != nil {
 					return err
 				}
@@ -78,9 +79,15 @@ func NewCmdImpersonate(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
+			// Resolve the real org ObjectID
+			realOrgID, err := resolveOrgID(client, orgID)
+			if err != nil {
+				return fmt.Errorf("resolving org: %w", err)
+			}
+
 			// Resolve user for org (when only --org is given)
 			if userID == "" {
-				resolved, err := resolveUserForOrg(client, orgID)
+				resolved, err := resolveUserForOrg(client, realOrgID)
 				if err != nil {
 					return fmt.Errorf("resolving user for org: %w", err)
 				}
@@ -141,6 +148,7 @@ func NewCmdImpersonate(f *factory.Factory) *cobra.Command {
 			// Replace with impersonated token
 			ctx.Token = tokenResp.AccessToken
 			ctx.RefreshToken = tokenResp.RefreshToken
+			ctx.OrgID = realOrgID
 
 			if err := f.SaveConfig(); err != nil {
 				return err
@@ -159,6 +167,40 @@ func NewCmdImpersonate(f *factory.Factory) *cobra.Command {
 	return cmd
 }
 
+// resolveOrgID resolves an org name or short ID to its full ObjectID
+// by querying /api2/organizations.
+func resolveOrgID(client *api.APIClient, oid string) (string, error) {
+	// If it looks like a 24-char hex ObjectID, assume it's already resolved.
+	if len(oid) == 24 {
+		return oid, nil
+	}
+
+	q := url.Values{}
+	q.Set("name", oid)
+	body, err := client.Get("/api2/organizations", q)
+	if err != nil {
+		return "", err
+	}
+
+	var matches []string
+	for _, org := range gjson.GetBytes(body, "result").Array() {
+		if org.Get("name").String() == oid {
+			if id := org.Get("_id").String(); id != "" {
+				matches = append(matches, id)
+			}
+		}
+	}
+
+	switch len(matches) {
+	case 0:
+		return "", fmt.Errorf("organization %q not found", oid)
+	case 1:
+		return matches[0], nil
+	default:
+		return "", fmt.Errorf("multiple organizations named %q found: %v\nHint: use the full org ID instead (e.g. --org %s)", oid, matches, matches[0])
+	}
+}
+
 // resolveUserForOrg finds the admin user for an org.
 func resolveUserForOrg(client *api.APIClient, oid string) (string, error) {
 	q := url.Values{}
@@ -171,12 +213,24 @@ func resolveUserForOrg(client *api.APIClient, oid string) (string, error) {
 	}
 
 	results := gjson.GetBytes(body, "result")
-	if !results.Exists() {
+	if !results.Exists() || len(results.Array()) == 0 {
 		return "", fmt.Errorf("no users found for org %s", oid)
 	}
 
-	// Find admin user
+	// Prefer users that actually belong to this org (same oid),
+	// not platform admins who have cross-org access.
+	var candidates []gjson.Result
 	for _, user := range results.Array() {
+		if user.Get("oid").String() == oid {
+			candidates = append(candidates, user)
+		}
+	}
+	if len(candidates) == 0 {
+		candidates = results.Array()
+	}
+
+	// Find admin user
+	for _, user := range candidates {
 		if user.Get("roleName").String() == "admin" {
 			uid := user.Get("_id").String()
 			if uid != "" {
@@ -185,8 +239,8 @@ func resolveUserForOrg(client *api.APIClient, oid string) (string, error) {
 		}
 	}
 
-	// Fallback: first user
-	uid := results.Array()[0].Get("_id").String()
+	// Fallback: first candidate
+	uid := candidates[0].Get("_id").String()
 	if uid == "" {
 		return "", fmt.Errorf("no user ID found for org %s", oid)
 	}

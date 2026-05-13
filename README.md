@@ -238,8 +238,8 @@ devicemanager edge agent get <agent-id>                       # Engine details
 devicemanager edge agent upload <file-path> --description "IR615 engine"  # Upload engine
 devicemanager edge agent update <agent-id> --description "new desc"       # Update engine
 devicemanager edge agent delete <agent-id>                    # Delete engine
-devicemanager edge agent devices <agent-id>                   # List deployed devices
-devicemanager edge agent devices <agent-id> --status READY    # Filter by status (PENDING/INSTALLING/DOWNLOADING/READY/FAILED)
+devicemanager edge agent devices <agent-id>                   # List deployed devices (default: pending)
+devicemanager edge agent devices <agent-id> --status ready    # Filter by status (pending/installing/downloading/ready/failed)
 devicemanager edge agent deploy <agent-id> <device-id>...     # Deploy agent to devices
 devicemanager edge agent deploy <agent-id> --group <group-id> # Deploy agent to device group
 devicemanager edge agent undeploy <agent-id> <device-id>...   # Remove agent from devices
@@ -393,9 +393,9 @@ devicemanager firmware devices <firmware-id> list                # List devices 
 devicemanager firmware devices <firmware-id> add <device-id>...  # Add devices for batch upgrade
 devicemanager firmware devices <firmware-id> add --group <group-id>  # Upgrade by device group
 devicemanager firmware devices <firmware-id> remove <device-id>  # Remove device from upgrade
-devicemanager firmware job-stats <job-id>                        # Upgrade job statistics
-devicemanager firmware cancel <job-id> <device-id>               # Cancel upgrade for a device
-devicemanager firmware retry <job-id> <device-id>                # Retry upgrade for a device
+devicemanager firmware job-stats <firmware-id>                   # Upgrade job statistics
+devicemanager firmware cancel <firmware-id> <device-id>          # Cancel upgrade for a device
+devicemanager firmware retry <firmware-id> <device-id>           # Retry failed upgrade for a device
 ```
 
 ### Device model documentation

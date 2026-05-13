@@ -1,3 +1,35 @@
+# v0.5.6 (2026-05-13)
+
+## Bug Fixes
+
+### Auth Impersonate
+- **impersonate resolves wrong user**: `resolveUserForOrg` with short org name (e.g. `--org 123`) returned root org admins instead of the target org's own users; now resolves org name → ObjectID via `/api2/organizations` first, then queries users with the real ID
+- **ambiguous org name**: when multiple orgs share the same name, now reports an error with all matching IDs instead of silently picking the wrong one
+- **org ID not persisted**: impersonate now saves the real org ObjectID to config (`org_id` field), cleared on `--stop`
+
+### DRC Commands
+- **wrong org data**: all DRC commands (`list`, `get`, `create`, `delete`, `devices add/list/remove/restart`) now pass `oid` as query parameter, matching frontend behavior
+- **devices add Service unavailable**: `drc devices add` and `firmware devices add` now always send both `deviceIds` and `deviceGroupIds` fields (even as empty arrays); missing fields caused backend to return `Service unavailable` (error_code 10002)
+
+### Firmware Management
+- **firmware cancel not working**: `firmware cancel` now calls `DELETE /api/job/{firmwareID}/devices/{deviceID}` directly, matching frontend behavior
+- **parameter naming**: `firmware cancel` and `firmware retry` renamed `<job-id>` to `<firmware-id>` with Long descriptions and Examples explaining how to find the firmware ID
+
+### File Upload (400 Bad Request)
+- **device import upload fails**: `/api/file/form` upload endpoint requires `access_token` query parameter (not `Authorization` header); fixed in `device import` and `firmware upload`
+- **edge agent/version upload fails**: `/api/edge/agents/upload` and `/api/edge/apps/upload` have the same issue; now pass `access_token` as query parameter
+
+### Device Web
+- **no URL returned**: `device web` now polls `GET /api2/tasks/{id}` after creating the ngrok task, instead of only checking the initial POST response which returns before the task completes
+
+### Edge Computing
+- **agent devices missing status**: `edge agent devices --status` was optional but the API requires it; now defaults to `pending` (matching frontend); help text corrected to lowercase values (`pending/installing/downloading/ready/failed`)
+
+### System
+- **user list wrong org**: `system user list` now auto-applies `oid` from impersonated context; `--oid` flag takes priority when explicitly specified
+
+---
+
 # v0.5.5 (2026-05-12)
 
 ## New Features

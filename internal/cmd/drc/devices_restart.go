@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/inhandnet/devicemanager-cli/internal/api"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
@@ -25,7 +26,9 @@ func NewCmdDevicesRestart(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Put(fmt.Sprintf("/api/jobs/%s/devices/%s/restart", templateID, deviceID), nil)
+			resp, err := client.Do("PUT", fmt.Sprintf("/api/jobs/%s/devices/%s/restart", templateID, deviceID), &api.RequestOptions{
+				Query: oidQuery(f),
+			})
 			if err != nil {
 				return err
 			}

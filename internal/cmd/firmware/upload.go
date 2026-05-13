@@ -2,11 +2,13 @@ package firmware
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 
+	"github.com/inhandnet/devicemanager-cli/internal/cmdutil"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
@@ -35,7 +37,12 @@ is needed when creating a firmware record with 'firmware create --fid <fid>'.`,
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.UploadWithFields("/api/file/form", "file", filePath, file, map[string]string{
+			q := url.Values{}
+			q.Set("access_token", f.Token())
+			cmdutil.SetQueryParam(q, "oid", f.OrgID())
+			uploadURL := fmt.Sprintf("/api/file/form?%s", q.Encode())
+
+			resp, err := client.UploadWithFields(uploadURL, "file", filepath.Base(filePath), file, map[string]string{
 				"filename": filepath.Base(filePath),
 			})
 			if err != nil {

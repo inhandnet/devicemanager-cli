@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/inhandnet/devicemanager-cli/internal/api"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
@@ -31,7 +32,7 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			body := map[string]interface{}{
+			body := map[string]any{
 				"name":    opts.Name,
 				"model":   opts.Model,
 				"content": opts.Content,
@@ -48,7 +49,10 @@ func NewCmdCreate(f *factory.Factory) *cobra.Command {
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Post("/api/drc", body)
+			resp, err := client.Do("POST", "/api/drc", &api.RequestOptions{
+				Query: oidQuery(f),
+				Body:  body,
+			})
 			if err != nil {
 				return err
 			}

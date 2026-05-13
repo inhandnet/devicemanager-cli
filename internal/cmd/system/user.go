@@ -47,6 +47,8 @@ func newCmdUserList(f *factory.Factory) *cobra.Command {
 
 			if oid, _ := cmd.Flags().GetString("oid"); oid != "" {
 				q.Set("oid", oid)
+			} else if oid := f.OrgID(); oid != "" {
+				q.Set("oid", oid)
 			}
 
 			output, _ := cmd.Flags().GetString("output")

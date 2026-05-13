@@ -2,7 +2,6 @@ package drc
 
 import (
 	"fmt"
-	"net/url"
 
 	"github.com/spf13/cobra"
 
@@ -31,7 +30,7 @@ func NewCmdDevicesList(f *factory.Factory) *cobra.Command {
 				return err
 			}
 
-			q := url.Values{}
+			q := oidQuery(f)
 			opts.ApplyTo(q)
 			cmdutil.SetQueryParam(q, "name", opts.Name)
 			cmdutil.SetQueryParam(q, "serialNumber", opts.SerialNumber)
