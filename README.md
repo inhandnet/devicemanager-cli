@@ -66,6 +66,8 @@ devicemanager config use-context <name>
 devicemanager config current-context
 devicemanager config list-contexts
 devicemanager config delete-context <name>
+devicemanager config set ngrok-server my-ngrok.example.com:4443  # Set custom ngrok server
+devicemanager config get ngrok-server                              # Get current value
 ```
 
 ### API calls
@@ -115,9 +117,10 @@ devicemanager device count total --start-time 2026-04-01 --end-time 2026-05-01  
 devicemanager device clients list <device-id>                      # List connected clients
 devicemanager device clients batch <device-id>...                  # Batch query clients
 
-# Remote web management
+# Remote web management (server auto-detected from API host)
 devicemanager device web <device-id>                               # Start remote web management
 devicemanager device web <device-id> --port 443 --proto https      # Custom port/protocol
+devicemanager device web <device-id> --server my-ngrok:4443        # Override server
 
 # Device update & delete
 devicemanager device update <device-id> --name "new-name"          # Rename device
@@ -238,8 +241,8 @@ devicemanager edge agent get <agent-id>                       # Engine details
 devicemanager edge agent upload <file-path> --description "IR615 engine"  # Upload engine
 devicemanager edge agent update <agent-id> --description "new desc"       # Update engine
 devicemanager edge agent delete <agent-id>                    # Delete engine
-devicemanager edge agent devices <agent-id>                   # List deployed devices (default: pending)
-devicemanager edge agent devices <agent-id> --status ready    # Filter by status (pending/installing/downloading/ready/failed)
+devicemanager edge agent devices <agent-id>                   # List deployed devices (default: PENDING)
+devicemanager edge agent devices <agent-id> --status READY    # Filter by status (PENDING/INSTALLING/DOWNLOADING/READY/FAILED)
 devicemanager edge agent deploy <agent-id> <device-id>...     # Deploy agent to devices
 devicemanager edge agent deploy <agent-id> --group <group-id> # Deploy agent to device group
 devicemanager edge agent undeploy <agent-id> <device-id>...   # Remove agent from devices

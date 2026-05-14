@@ -324,7 +324,6 @@ func newCmdPermissionDevicesList(f *factory.Factory) *cobra.Command {
 			q := url.Values{}
 			flags.ApplyTo(q)
 
-
 			output, _ := cmd.Flags().GetString("output")
 
 			body, err := client.Get(fmt.Sprintf("/api/groups/%s/devices", args[0]), q)

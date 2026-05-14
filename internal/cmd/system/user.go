@@ -81,7 +81,6 @@ func newCmdUserGet(f *factory.Factory) *cobra.Command {
 
 			q := url.Values{}
 
-
 			output, _ := cmd.Flags().GetString("output")
 
 			body, err := client.Get(fmt.Sprintf("/api2/users/%s", args[0]), q)

@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tidwall/gjson"
 
+	"github.com/inhandnet/devicemanager-cli/internal/api"
 	"github.com/inhandnet/devicemanager-cli/internal/cmdutil"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
@@ -62,16 +63,29 @@ func NewCmdImport(f *factory.Factory) *cobra.Command {
 			groupID, _ := cmd.Flags().GetString("group")
 			noOverwrite, _ := cmd.Flags().GetBool("no-overwrite")
 
-			body := map[string]any{
+			data := map[string]any{
 				"toBeCovered": !noOverwrite,
 			}
 			if groupID != "" {
-				body["deviceGroupId"] = groupID
+				data["deviceGroupId"] = groupID
+			}
+
+			// Match frontend body: { publicAttribute: data, ...data }
+			body := map[string]any{
+				"publicAttribute": data,
+			}
+			for k, v := range data {
+				body[k] = v
 			}
 
 			output, _ := cmd.Flags().GetString("output")
 
-			resp, err := client.Post(fmt.Sprintf("/api/v2/devices/batch_add?file_id=%s", fileID), body)
+			batchQ := url.Values{}
+			batchQ.Set("file_id", fileID)
+			resp, err := client.Do("POST", "/api/v2/devices/batch_add", &api.RequestOptions{
+				Query: batchQ,
+				Body:  body,
+			})
 			if err != nil {
 				return err
 			}

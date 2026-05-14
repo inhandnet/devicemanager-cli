@@ -36,7 +36,6 @@ func newCmdOrgList(f *factory.Factory) *cobra.Command {
 
 			q := url.Values{}
 
-
 			if name, _ := cmd.Flags().GetString("name"); name != "" {
 				q.Set("name", name)
 			}
@@ -73,7 +72,6 @@ func newCmdOrgGet(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
-
 
 			output, _ := cmd.Flags().GetString("output")
 

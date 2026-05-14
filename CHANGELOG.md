@@ -1,3 +1,28 @@
+# v0.5.7 (2026-05-13)
+
+## Bug Fixes
+
+### Device Web
+- **wrong default ngrok server**: default `--server` changed from `ngrok.j3r0lin.com:4443` to `ngrok.iot.inhandnetworks.com:4443` (matching production frontend); previously caused timeout in test environments
+- **removed unnecessary polling**: reverted to single `POST /api2/tasks/run` call matching frontend behavior (backend already blocks until task completes)
+- **missing objectName field**: request body now includes `objectName` matching frontend `runTask` payload
+- **API error not surfaced**: when backend returns top-level `error`/`error_code` (e.g. `internal_error`), CLI now reports the real error instead of `unexpected task state: 0`
+- **dynamic ngrok server inference**: default server is now auto-detected from API host — `ngrok.iot.inhandnetworks.com:4443` (global), `iot.inhand.com.cn:4443` (cn), or `10.5.17.52:4443` (other); override via `--server` or `config set ngrok-server`
+
+### Device Import
+- **batch_add internal_error**: body was missing required `publicAttribute` wrapper; now matches frontend `{ publicAttribute: data, ...data }`
+- **query param handling**: `file_id` was manually appended to path causing encoding issues; now uses `client.Do` with proper `url.Values`
+
+### Edge Computing
+- **agent devices status case**: API requires uppercase (`PENDING/INSTALLING/DOWNLOADING/READY/FAILED`), not lowercase; default and help text corrected
+
+## Improvements
+
+### Configuration
+- **config set/get**: Add `devicemanager config set <key> <value>` and `devicemanager config get [key]` commands for managing global settings (currently supports `ngrok-server`)
+
+---
+
 # v0.5.6 (2026-05-13)
 
 ## Bug Fixes
@@ -18,12 +43,6 @@
 ### File Upload (400 Bad Request)
 - **device import upload fails**: `/api/file/form` upload endpoint requires `access_token` query parameter (not `Authorization` header); fixed in `device import` and `firmware upload`
 - **edge agent/version upload fails**: `/api/edge/agents/upload` and `/api/edge/apps/upload` have the same issue; now pass `access_token` as query parameter
-
-### Device Web
-- **no URL returned**: `device web` now polls `GET /api2/tasks/{id}` after creating the ngrok task, instead of only checking the initial POST response which returns before the task completes
-
-### Edge Computing
-- **agent devices missing status**: `edge agent devices --status` was optional but the API requires it; now defaults to `pending` (matching frontend); help text corrected to lowercase values (`pending/installing/downloading/ready/failed`)
 
 ### System
 - **user list wrong org**: `system user list` now auto-applies `oid` from impersonated context; `--oid` flag takes priority when explicitly specified

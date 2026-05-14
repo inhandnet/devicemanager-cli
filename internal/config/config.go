@@ -11,6 +11,7 @@ import (
 type Config struct {
 	CurrentContext string              `yaml:"current-context"`
 	Contexts       map[string]*Context `yaml:"contexts"`
+	NgrokServer    string              `yaml:"ngrok-server,omitempty"`
 }
 
 func (cfg *Config) ActiveContext() (*Context, error) {

@@ -37,6 +37,6 @@ func newCmdAgentDevices(f *factory.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String("status", "pending", "Filter by status (pending, installing, downloading, ready, failed)")
+	cmd.Flags().String("status", "PENDING", "Filter by status (PENDING, INSTALLING, DOWNLOADING, READY, FAILED)")
 	return cmd
 }

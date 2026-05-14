@@ -20,6 +20,8 @@ func NewCmdConfig(f *factory.Factory) *cobra.Command {
 	cmd.AddCommand(newCmdListContexts(f))
 	cmd.AddCommand(newCmdUseContext(f))
 	cmd.AddCommand(newCmdDeleteContext(f))
+	cmd.AddCommand(newCmdConfigSet(f))
+	cmd.AddCommand(newCmdConfigGet(f))
 
 	return cmd
 }
@@ -119,6 +121,96 @@ func newCmdDeleteContext(f *factory.Factory) *cobra.Command {
 				return err
 			}
 			fmt.Fprintf(f.IO.Out, "%s Deleted context %q\n", iostreams.Green("✓"), name)
+			return nil
+		},
+	}
+}
+
+var validConfigKeys = []string{"ngrok-server"}
+
+func isValidConfigKey(key string) bool {
+	for _, k := range validConfigKeys {
+		if k == key {
+			return true
+		}
+	}
+	return false
+}
+
+func newCmdConfigSet(f *factory.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:   "set <key> <value>",
+		Short: "Set a global configuration value",
+		Example: `  # Set custom ngrok server
+  devicemanager config set ngrok-server my-ngrok.example.com:4443`,
+		Args: cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := f.Config()
+			if err != nil {
+				return err
+			}
+			key := args[0]
+			value := args[1]
+			if !isValidConfigKey(key) {
+				return fmt.Errorf("unknown config key %q; valid keys: %v", key, validConfigKeys)
+			}
+			if key == "ngrok-server" {
+				cfg.NgrokServer = value
+			}
+			if err := f.SaveConfig(); err != nil {
+				return err
+			}
+			fmt.Fprintf(f.IO.Out, "%s Set %s = %s\n", iostreams.Green("✓"), key, value)
+			return nil
+		},
+	}
+}
+
+func newCmdConfigGet(f *factory.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:   "get [key]",
+		Short: "Get configuration values",
+		Example: `  # Get all config values
+  devicemanager config get
+
+  # Get specific value
+  devicemanager config get ngrok-server`,
+		Args: cobra.MaximumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := f.Config()
+			if err != nil {
+				return err
+			}
+
+			if len(args) == 0 {
+				// Show all
+				tp := iostreams.NewTablePrinter(f.IO.Out, f.IO.IsStdoutTTY())
+				tp.AddRow("KEY", "VALUE")
+				for _, key := range validConfigKeys {
+					var value string
+					if key == "ngrok-server" {
+						value = cfg.NgrokServer
+					}
+					if value == "" {
+						value = "(not set)"
+					}
+					tp.AddRow(key, value)
+				}
+				return tp.Render()
+			}
+
+			key := args[0]
+			if !isValidConfigKey(key) {
+				return fmt.Errorf("unknown config key %q; valid keys: %v", key, validConfigKeys)
+			}
+			var value string
+			if key == "ngrok-server" {
+				value = cfg.NgrokServer
+			}
+			if value == "" {
+				value = "(not set)"
+			}
+			fmt.Fprintln(f.IO.Out, value)
 			return nil
 		},
 	}
