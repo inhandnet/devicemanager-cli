@@ -260,6 +260,8 @@ devicemanager edge app logs <device-id> <app-name>            # View app runtime
 devicemanager edge app deploy <app-id> --version <ver> <device-id>...  # Deploy app to devices
 devicemanager edge app deploy <app-id> --version <ver> --group <id>    # Deploy app to group
 devicemanager edge app undeploy <app-id> <device-id>...       # Cancel app deployment from devices
+devicemanager edge app devices <app-id>                        # List deployed devices (default: PENDING)
+devicemanager edge app devices <app-id> --status READY         # Filter by status
 ```
 
 #### Application versions
@@ -283,6 +285,8 @@ devicemanager edge config update <app-id> <config-id> --description "..."   # Up
 devicemanager edge config delete <app-id> <config-id>         # Delete config
 devicemanager edge config deploy <app-id> <version> --device <id> --group <id>  # Deploy config
 devicemanager edge config undeploy <app-id> <device-id>...    # Cancel config deployment from devices
+devicemanager edge config devices <app-id>                      # List deployed config devices (default: PENDING)
+devicemanager edge config devices <app-id> --status READY       # Filter by status
 ```
 
 #### Remote control

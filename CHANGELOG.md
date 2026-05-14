@@ -21,6 +21,10 @@
 ### Configuration
 - **config set/get**: Add `devicemanager config set <key> <value>` and `devicemanager config get [key]` commands for managing global settings (currently supports `ngrok-server`)
 
+### Edge Computing
+- **edge app devices**: Add `devicemanager edge app devices <app-id>` to list devices with an edge app deployed; supports `--status` and pagination (`--cursor`/`--limit`)
+- **edge config devices**: Add `devicemanager edge config devices <app-id>` to list devices with an edge app config deployed; supports `--status` and pagination
+
 ---
 
 # v0.5.6 (2026-05-13)

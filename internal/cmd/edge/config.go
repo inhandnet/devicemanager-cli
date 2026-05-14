@@ -19,6 +19,7 @@ func newCmdConfig(f *factory.Factory) *cobra.Command {
 	cmd.AddCommand(newCmdConfigDelete(f))
 	cmd.AddCommand(newCmdConfigDeploy(f))
 	cmd.AddCommand(newCmdConfigUndeploy(f))
+	cmd.AddCommand(newCmdConfigDevices(f))
 
 	return cmd
 }
