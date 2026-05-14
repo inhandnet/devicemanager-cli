@@ -6,11 +6,14 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/inhandnet/devicemanager-cli/internal/cmdutil"
 	"github.com/inhandnet/devicemanager-cli/internal/factory"
 	"github.com/inhandnet/devicemanager-cli/internal/iostreams"
 )
 
 func newCmdAgentDevices(f *factory.Factory) *cobra.Command {
+	opts := &cmdutil.ListFlags{}
+
 	cmd := &cobra.Command{
 		Use:   "devices <agent-id>",
 		Short: "List devices deployed with an edge agent",
@@ -22,6 +25,8 @@ func newCmdAgentDevices(f *factory.Factory) *cobra.Command {
 			}
 
 			q := url.Values{}
+			opts.ApplyTo(q)
+
 			status, _ := cmd.Flags().GetString("status")
 			q.Set("status", status)
 
@@ -33,10 +38,11 @@ func newCmdAgentDevices(f *factory.Factory) *cobra.Command {
 			}
 
 			return iostreams.FormatOutput(body, f.IO, output,
-				iostreams.WithColumns("_id", "name", "serialNumber", "status"))
+				iostreams.WithColumns("deviceId", "status", "version", "currentVersion"))
 		},
 	}
 
+	opts.Register(cmd)
 	cmd.Flags().String("status", "PENDING", "Filter by status (PENDING, INSTALLING, DOWNLOADING, READY, FAILED)")
 	return cmd
 }

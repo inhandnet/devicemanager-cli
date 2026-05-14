@@ -15,6 +15,7 @@
 
 ### Edge Computing
 - **agent devices status case**: API requires uppercase (`PENDING/INSTALLING/DOWNLOADING/READY/FAILED`), not lowercase; default and help text corrected
+- **agent devices pagination**: Add `--cursor` and `--limit` pagination support to `edge agent devices`
 
 ## Improvements
 

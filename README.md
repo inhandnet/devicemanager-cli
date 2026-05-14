@@ -243,6 +243,7 @@ devicemanager edge agent update <agent-id> --description "new desc"       # Upda
 devicemanager edge agent delete <agent-id>                    # Delete engine
 devicemanager edge agent devices <agent-id>                   # List deployed devices (default: PENDING)
 devicemanager edge agent devices <agent-id> --status READY    # Filter by status (PENDING/INSTALLING/DOWNLOADING/READY/FAILED)
+devicemanager edge agent devices <agent-id> --limit 10        # Pagination support
 devicemanager edge agent deploy <agent-id> <device-id>...     # Deploy agent to devices
 devicemanager edge agent deploy <agent-id> --group <group-id> # Deploy agent to device group
 devicemanager edge agent undeploy <agent-id> <device-id>...   # Remove agent from devices
