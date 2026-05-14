@@ -1,3 +1,18 @@
+# v0.5.8 (2026-05-14)
+
+## New Features
+
+### Edge Computing
+- **edge app devices**: Add `devicemanager edge app devices <app-id>` to list devices with an edge app deployed; supports `--status` and pagination (`--cursor`/`--limit`)
+- **edge config devices**: Add `devicemanager edge config devices <app-id>` to list devices with an edge app config deployed; supports `--status` and pagination
+
+## Improvements
+
+### Edge Computing
+- **agent devices pagination**: Add `--cursor` and `--limit` pagination support to `edge agent devices`
+
+---
+
 # v0.5.7 (2026-05-13)
 
 ## Bug Fixes
@@ -15,16 +30,11 @@
 
 ### Edge Computing
 - **agent devices status case**: API requires uppercase (`PENDING/INSTALLING/DOWNLOADING/READY/FAILED`), not lowercase; default and help text corrected
-- **agent devices pagination**: Add `--cursor` and `--limit` pagination support to `edge agent devices`
 
 ## Improvements
 
 ### Configuration
 - **config set/get**: Add `devicemanager config set <key> <value>` and `devicemanager config get [key]` commands for managing global settings (currently supports `ngrok-server`)
-
-### Edge Computing
-- **edge app devices**: Add `devicemanager edge app devices <app-id>` to list devices with an edge app deployed; supports `--status` and pagination (`--cursor`/`--limit`)
-- **edge config devices**: Add `devicemanager edge config devices <app-id>` to list devices with an edge app config deployed; supports `--status` and pagination
 
 ---
 
